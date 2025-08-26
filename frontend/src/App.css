@@ -1,42 +1,83 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* สไตล์หลัก */
+body {
+  margin: 0;
+}
+
+/* สไตล์สำหรับหน้าล็อกอิน */
+.login {
+  background-image: url('/gym.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.header {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.card-login {
+  overflow-y: scroll;
+  width: 70%;
+  height: auto;
+  max-height: 550px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.images-logo {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.login-form-button {
+  width: 100%;
 }
 
-.card {
-  padding: 2em;
+/* --- สไตล์สำหรับเมนูของ Ant Design --- */
+
+/* กำหนดสีพื้นหลังเมื่อเมนูถูกเลือก ไม่ว่า Sider จะถูกย่อหรือไม่ก็ตาม */
+.ant-menu-inline .ant-menu-item-selected,
+.ant-menu-inline-collapsed .ant-menu-item-selected {
+  background-color: #000000 !important;
 }
 
-.read-the-docs {
-  color: #888;
+/* กำหนดสีของตัวอักษรและไอคอนของเมนูที่ถูกเลือก */
+.ant-menu-inline .ant-menu-item-selected .ant-menu-item-icon,
+.ant-menu-inline .ant-menu-item-selected span,
+.ant-menu-inline-collapsed .ant-menu-item-selected .ant-menu-item-icon,
+.ant-menu-inline-collapsed .ant-menu-item-selected span {
+  color: #fff !important;
+}
+
+/* เปลี่ยนสีพื้นหลังของปุ่มย่อ/ขยาย Sider */
+.ant-layout-sider-trigger {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* สไตล์สำหรับเมนูย่อย (SubMenu) ที่ปรากฏเป็น pop-up */
+.ant-menu-submenu-popup {
+  background-color: #fff !important;
+  color: #fff !important;
+}
+
+/* กำหนดสีตัวอักษรและไอคอนของเมนูย่อยใน pop-up */
+.ant-menu-submenu-popup .ant-menu-item,
+.ant-menu-submenu-popup .ant-menu-submenu-title {
+  color: #fff !important;
+  background-color: #333333 !important;
+}
+
+/* กำหนดสีพื้นหลังของเมนูย่อยเมื่อเอาเมาส์ไปชี้ */
+.ant-menu-submenu-popup .ant-menu-item:hover,
+.ant-menu-submenu-popup .ant-menu-submenu-title:hover {
+  background-color: #333333 !important;
+  color: #fff !important;
+}
+
+/* เปลี่ยนสีลูกศรของเมนูย่อยในทุกสถานะ */
+.ant-menu-submenu-arrow {
+  color: #fff !important;
 }
