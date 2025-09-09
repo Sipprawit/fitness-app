@@ -5,32 +5,34 @@ import (
 	"time"
 
 	"example.com/fitness-backend/entity"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// เพิ่มตัวแปร SecretKey ที่สามารถเข้าถึงได้จากภายนอก
+// SecretKey สำหรับ JWT
 var SecretKey string = "SvNQpBN8y3qlVrsGAYYWoJJk56LtzFHx"
 
 var db *gorm.DB
 
-// HashPassword เป็น function สำหรับการแปลง password
+// HashPassword แปลง password
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-// CheckPasswordHash เป็น function สำหรับ check password ที่ hash แล้ว ว่าตรงกันหรือไม่
+// CheckPasswordHash ตรวจสอบ password
 func CheckPasswordHash(password, hash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hash, password)
 	return err == nil
 }
 
+// DB คืนค่า gorm.DB
 func DB() *gorm.DB {
 	return db
 }
 
+// ConnectionDB เชื่อม sqlite
 func ConnectionDB() {
 	database, err := gorm.Open(sqlite.Open("sa.db?cache=shared"), &gorm.Config{})
 	if err != nil {
@@ -40,71 +42,65 @@ func ConnectionDB() {
 	db = database
 }
 
+// SetupDatabase สร้าง table และข้อมูลเริ่มต้น
+// ... (import statements)
+
+// SetupDatabase สร้าง table และข้อมูลเริ่มต้น
 func SetupDatabase() {
-	// AutoMigrate models
 	db.AutoMigrate(
-		&entity.Users{},
 		&entity.Genders{},
+		&entity.Users{}, // <-- เปลี่ยน
+		&entity.Trainer{},  // <-- เพิ่ม
+		&entity.Admin{},    // <-- เพิ่ม
+		&entity.Health{},
+		&entity.Activity{},
 	)
 
-	// Gender Data
-	GenderMale := entity.Genders{Gender: "Male"}
-	GenderFemale := entity.Genders{Gender: "Female"}
-	db.FirstOrCreate(&GenderMale, &entity.Genders{Gender: "Male"})
-	db.FirstOrCreate(&GenderFemale, &entity.Genders{Gender: "Female"})
+	// Seed genders (idempotent)
+	var male entity.Genders
+	db.Where(entity.Genders{Gender: "ชาย"}).FirstOrInit(&male)
+	if male.ID == 0 {
+		db.Create(&entity.Genders{Gender: "ชาย"})
+	}
 
-	// Create a default password and birthday for all test users
+	var female entity.Genders
+	db.Where(entity.Genders{Gender: "หญิง"}).FirstOrInit(&female)
+	if female.ID == 0 {
+		db.Create(&entity.Genders{Gender: "หญิง"})
+	}
+
+	var other entity.Genders
+	db.Where(entity.Genders{Gender: "อื่นๆ"}).FirstOrInit(&other)
+	if other.ID == 0 {
+		db.Create(&entity.Genders{Gender: "อื่นๆ"})
+	}
+
+
+	// Password & Birthday default
 	hashedPassword, _ := HashPassword("123456")
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 	formattedBirthDay := BirthDay.Format("2006-01-02")
 
-	// Users to be created or updated
-	users := []entity.Users{
-		{
-			FirstName: "Admin",
-			LastName: "User",
-			Email:"admin@gmail.com",
-			Age: 35,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID:1,
-			Actor: "admin",
-		},
-		{
-			FirstName: "Trainer",
-			LastName: "User",
-			Email: "trainer@gmail.com",
-			Age: 28,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID: 1,
-			Actor: "trainer",
-		},
-		{
-			FirstName: "Customer",
-			LastName: "User",
-			Email: "customer@gmail.com",
-			Age: 25,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID: 2,
-			Actor: "customer",
-		},
+	// --- สร้างข้อมูลเริ่มต้นใหม่ ---
+
+	// Admin
+	var admin entity.Admin
+	db.Where(entity.Admin{Email: "admin@gmail.com"}).FirstOrInit(&admin)
+	if admin.ID == 0 {
+		db.Create(&entity.Admin{FirstName: "Admin", LastName: "User", Email: "admin@gmail.com", Password: hashedPassword})
 	}
 
-	// Loop through users and update their passwords to a fresh hash every time
-	for _, user := range users {
-		var existingUser entity.Users
-		// First, check if the user already exists
-		if tx := db.Where("email = ?", user.Email).First(&existingUser); tx.RowsAffected > 0 {
-			// If the user exists, update their password hash and other details
-			db.Model(&existingUser).Updates(map[string]interface{}{
-				"password": user.Password,
-				"actor": user.Actor,
-			})
-		} else {
-			// If the user does not exist, create a new one
-			db.Create(&user)
-		}
+	// Trainer
+	var trainer entity.Trainer
+	db.Where(entity.Trainer{Email: "trainer@gmail.com"}).FirstOrInit(&trainer)
+	if trainer.ID == 0 {
+		db.Create(&entity.Trainer{FirstName: "Trainer", LastName: "User", Email: "trainer@gmail.com", Password: hashedPassword})
+	}
+
+	// Customer
+	var customer entity.Users
+	db.Where(entity.Users{Email: "customer@gmail.com"}).FirstOrInit(&customer)
+	if customer.ID == 0 {
+		db.Create(&entity.Users{FirstName: "Customer", LastName: "User", Email: "customer@gmail.com", Age: 25, Password: hashedPassword, BirthDay: formattedBirthDay, GenderID: 2})
 	}
 }
