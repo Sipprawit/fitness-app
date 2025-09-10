@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"example.com/fitness-backend/entity"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // เพิ่มตัวแปร SecretKey ที่สามารถเข้าถึงได้จากภายนอก
@@ -45,6 +45,9 @@ func SetupDatabase() {
 	db.AutoMigrate(
 		&entity.Users{},
 		&entity.Genders{},
+		&entity.ClassActivity{},
+		&entity.Equipment{},
+		&entity.Facility{},
 	)
 
 	// Gender Data
@@ -62,33 +65,33 @@ func SetupDatabase() {
 	users := []entity.Users{
 		{
 			FirstName: "Admin",
-			LastName: "User",
-			Email:"admin@gmail.com",
-			Age: 35,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID:1,
-			Actor: "admin",
+			LastName:  "User",
+			Email:     "admin@gmail.com",
+			Age:       35,
+			Password:  hashedPassword,
+			BirthDay:  formattedBirthDay,
+			GenderID:  1,
+			Actor:     "admin",
 		},
 		{
 			FirstName: "Trainer",
-			LastName: "User",
-			Email: "trainer@gmail.com",
-			Age: 28,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID: 1,
-			Actor: "trainer",
+			LastName:  "User",
+			Email:     "trainer@gmail.com",
+			Age:       28,
+			Password:  hashedPassword,
+			BirthDay:  formattedBirthDay,
+			GenderID:  1,
+			Actor:     "trainer",
 		},
 		{
 			FirstName: "Customer",
-			LastName: "User",
-			Email: "customer@gmail.com",
-			Age: 25,
-			Password: hashedPassword,
-			BirthDay: formattedBirthDay,
-			GenderID: 2,
-			Actor: "customer",
+			LastName:  "User",
+			Email:     "customer@gmail.com",
+			Age:       25,
+			Password:  hashedPassword,
+			BirthDay:  formattedBirthDay,
+			GenderID:  2,
+			Actor:     "customer",
 		},
 	}
 
@@ -100,11 +103,47 @@ func SetupDatabase() {
 			// If the user exists, update their password hash and other details
 			db.Model(&existingUser).Updates(map[string]interface{}{
 				"password": user.Password,
-				"actor": user.Actor,
+				"actor":    user.Actor,
 			})
 		} else {
 			// If the user does not exist, create a new one
 			db.Create(&user)
+		}
+	}
+
+	// Seed ClassActivity if empty
+	var existingClass entity.ClassActivity
+	if db.First(&existingClass).Error != nil {
+		classes := []entity.ClassActivity{
+			{Name: "Yoga Beginner", Description: "คลาสโยคะสำหรับผู้เริ่มต้น", Date: time.Now().Format("2006-01-02"), StartTime: "13:00", EndTime: "14:00", Location: "Yoga Room", Capacity: 20, ImageURL: ""},
+			{Name: "HIIT Training", Description: "คลาสคาร์ดิโอความเข้มข้นสูง", Date: time.Now().Format("2006-01-02"), StartTime: "15:00", EndTime: "15:45", Location: "Weight Zone", Capacity: 12, ImageURL: ""},
+		}
+		for _, c := range classes {
+			db.Create(&c)
+		}
+	}
+
+	// Seed Equipment if empty
+	var existingEquipment entity.Equipment
+	if db.First(&existingEquipment).Error != nil {
+		equipments := []entity.Equipment{
+			{Name: "ลู่วิ่ง A", Type: "คาร์ดิโอ", Zone: "โซนคาร์ดิโอ", Status: "Available", Condition: "Good", UsageHours: 120},
+			{Name: "ชุดดัมเบล", Type: "เวทเทรนนิ่ง", Zone: "โซนเวท", Status: "Available", Condition: "Good", UsageHours: 300},
+		}
+		for _, e := range equipments {
+			db.Create(&e)
+		}
+	}
+
+	// Seed Facility if empty
+	var existingFacility entity.Facility
+	if db.First(&existingFacility).Error != nil {
+		facilities := []entity.Facility{
+			{Name: "ห้องโยคะ", Zone: "A", Status: "Open", Capacity: 20},
+			{Name: "โซนเวท", Zone: "B", Status: "Open", Capacity: 30},
+		}
+		for _, f := range facilities {
+			db.Create(&f)
 		}
 	}
 }
