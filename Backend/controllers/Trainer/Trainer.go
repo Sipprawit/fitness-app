@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 	"strings"
+	"os"
 
 	"example.com/fitness-backend/entity"
 	"example.com/fitness-backend/services"
@@ -104,7 +105,14 @@ func UploadFile(c *gin.Context) {
 
 	// สร้างชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ
 	filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(file.Filename))
-	savePath := filepath.Join("uploads", "trainers", filename) 
+	dirPath := filepath.Join("uploads", "trainers")
+	savePath := filepath.Join(dirPath, filename) 
+
+	// สร้างโฟลเดอร์ถ้ายังไม่มี
+	if err := os.MkdirAll(dirPath, 0755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถสร้างโฟลเดอร์จัดเก็บไฟล์ได้"})
+		return
+	}
 
 	// บันทึกไฟล์ลงในโฟลเดอร์ของเซิร์ฟเวอร์
 	if err := c.SaveUploadedFile(file, savePath); err != nil {

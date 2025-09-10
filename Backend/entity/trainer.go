@@ -6,14 +6,16 @@ import (
 
 type Trainer struct {
 	gorm.Model
-	FirstName   string   `json:"first_name"`
+    FirstName string   `json:"first_name"`
+    LastName  string   `json:"last_name"`
+    Email     string   `gorm:"uniqueIndex" json:"email"`
+    Password  string   `json:"password"`
+	Skill	  string   `json:"skill"`
+	Tel		  string   `json:"tel"`
+    GenderID  uint     `json:"gender_id"`
+    Gender    *Genders `gorm:"foreignKey:GenderID" json:"gender"`
+    ProfileImage string `json:"profile_image"`
 
-	LastName    string   `json:"last_name"`
-
-	Email       string   `gorm:"uniqueIndex" json:"email"`
+    Schedules []TrainerSchedule `gorm:"foreignKey:TrainerID" json:"schedules"`
 	
-	Password    string   `json:"-"`
-	// อาจจะมีฟิลด์อื่นๆ สำหรับเทรนเนอร์โดยเฉพาะ เช่น
-	// Specialization string `json:"specialization"`
-	// Certification  string `json:"certification"`
 }
