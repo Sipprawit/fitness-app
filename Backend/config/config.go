@@ -49,11 +49,13 @@ func ConnectionDB() {
 func SetupDatabase() {
 	db.AutoMigrate(
 		&entity.Genders{},
-		&entity.Users{}, // <-- เปลี่ยน
-		&entity.Trainer{},  // <-- เพิ่ม
-		&entity.Admin{},    // <-- เพิ่ม
+		&entity.Users{},   
+		&entity.Trainer{}, 
+		&entity.Admin{},   
 		&entity.Health{},
 		&entity.Activity{},
+		&entity.Nutrition{},
+		&entity.Meal{},
 	)
 
 	// Seed genders (idempotent)
@@ -74,7 +76,6 @@ func SetupDatabase() {
 	if other.ID == 0 {
 		db.Create(&entity.Genders{Gender: "อื่นๆ"})
 	}
-
 
 	// Password & Birthday default
 	hashedPassword, _ := HashPassword("123456")
