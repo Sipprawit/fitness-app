@@ -8,7 +8,6 @@ import (
 
    "github.com/gin-gonic/gin"
 
-    
    "example.com/fitness-backend/config"
 
    "example.com/fitness-backend/controllers/genders"
@@ -17,12 +16,9 @@ import (
 
    "example.com/fitness-backend/middlewares"
 
-   "example.com/fitness-backend/controllers/Trainer"
-   
-   "example.com/fitness-backend/controllers/TrainerSchedule"
-
-   "example.com/fitness-backend/controllers/TrainBooking" 
-
+   "example.com/fitness-backend/routes"
+    "github.com/gin-contrib/cors"
+    "time"
 )
 
 
@@ -44,58 +40,37 @@ func main() {
 
    r := gin.Default()
 
-   r.Use(CORSMiddleware())
-   
-   r.Static("/uploads", "./uploads")
+   // เปิด CORS
+    r.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"http://localhost:5173"},
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+        ExposeHeaders:    []string{"Content-Length"},
+        AllowCredentials: true,
+        MaxAge: 12 * time.Hour,
+    }))
 
 
-   // Auth Route
-
+   // Auth Routes
    r.POST("/signup", users.SignUp)
-
    r.POST("/signin", users.SignIn)
 
-   r.POST("/upload", Trainer.UploadFile)
-
-
-   router := r.Group("/")
-
+   // API Group
+   api := r.Group("/api")
    {
+       api.Use(middlewares.Authorizes())
 
-       router.Use(middlewares.Authorizes())
+       // User Routes
+       api.PUT("/user/:id", users.Update)
+       api.GET("/users", users.GetAll)
+       api.GET("/user/:id", users.Get)
+       api.DELETE("/user/:id", users.Delete)
 
+       // Health & Activity Routes
+       routes.HealthRoutes(api)
 
-       // User Route
-
-       router.PUT("/user/:id", users.Update)
-       router.GET("/users", users.GetAll)
-       router.GET("/user/:id", users.Get)
-       router.DELETE("/user/:id", users.Delete)
-
-       //Trainer Routes
-       
-       router.POST("/trainers", Trainer.CreateTrainer)
-       router.GET("/trainers", Trainer.GetTrainers)
-       router.GET("/trainers/:id", Trainer.GetTrainerByID)
-       router.PUT("/trainers/:id", Trainer.UpdateTrainer)
-       router.DELETE("/trainers/:id", Trainer.DeleteTrainer)
-       router.POST("/trainers/:id/upload", Trainer.UploadFile)
-
-       // TrainerSchedule Routes
-       
-       router.POST("/trainer-schedules", TrainerSchedule.CreateTrainerSchedule)
-       router.GET("/trainer-schedules", TrainerSchedule.GetTrainerSchedules)
-       router.GET("/trainer-schedules/:id", TrainerSchedule.GetTrainerScheduleByID)
-       router.GET("/trainer-schedules/allschedules/:trainerID", TrainerSchedule.GetTrainerSchedulesByTrainerID)
-       router.PUT("/trainer-schedules/:id", TrainerSchedule.UpdateTrainerSchedule)
-       router.DELETE("/trainer-schedules/:id", TrainerSchedule.DeleteTrainerSchedule)
-       router.GET("/trainers/schedules/:trainerId", TrainerSchedule.GetTrainerSchedulesByDate)
-
-       // TrainBooking Routes
-       router.POST("/train-bookings", TrainBooking.CreateTrainBooking)
-       router.GET("/train-bookings/user/:userID", TrainBooking.GetUserBookings)
-       router.DELETE("/train-bookings/:id", TrainBooking.CancelTrainBooking)
-
+       // Trainer-related Routes
+       routes.TrainerRoutes(api)
    }
 
 
