@@ -12,7 +12,7 @@ import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/classHome";
 
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
-import HealthHome from "../pages/health/Health/HealthHome";
+import HealthHome from "../pages/health/Health/healthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
 
 import Group from "../pages/group/groupHome";
