@@ -166,14 +166,14 @@ const FullLayout: React.FC = () => {
           <Menu.Item key="Helth" style={{ color: "white" }}>
             <Link to="/health/Health">
               <MedicineBoxOutlined />
-              <span>ข้อมูลสุขภาพ</span>
+              <span>บันทึกสุขภาพ</span>
             </Link>
           </Menu.Item>
 
-          <Menu.Item key="Activity" style={{ color: "white" }}>
-            <Link to="/health/Activity">
+          <Menu.Item key="Nutrition" style={{ color: "white" }}>
+            <Link to="/health/nutrition">
               <CalendarOutlined />
-              <span>บันทึกออกกำลังกาย</span>
+              <span>โภชนาการ</span>
             </Link>
           </Menu.Item>
         </Menu.SubMenu>
