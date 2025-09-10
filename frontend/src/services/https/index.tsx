@@ -1,22 +1,20 @@
 import type { UsersInterface } from "../../interface/IUser";
 import type { SignInInterface } from "../../interface/SignIn";
 import axios, { type AxiosRequestConfig } from "axios";
+import type { NutritionData } from "../../interface/Nutrition";
 
-// กำหนด base URL สำหรับ API
 const apiUrl = "http://localhost:8000";
 
-// ฟังก์ชันสำหรับสร้าง config พร้อม token
 function authConfig(): AxiosRequestConfig {
   const token = localStorage.getItem("token");
   return {
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ ใช้ Bearer เสมอ
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   };
 }
 
-// ฟังก์ชันสำหรับ Login (ไม่ต้องการ Token)
 async function SignIn(data: SignInInterface) {
   try {
     return await axios.post(`${apiUrl}/signin`, data);
@@ -25,16 +23,15 @@ async function SignIn(data: SignInInterface) {
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลเพศ (ต้องการ Token)
 async function GetGender() {
   try {
-    return await axios.get(`${apiUrl}/genders`, authConfig());
+    // ไม่ต้องใส่ token ตอนยังไม่ล็อกอิน
+    return await axios.get(`${apiUrl}/genders`);
   } catch (e: any) {
     return e.response;
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมด (ต้องการ Token)
 async function GetUsers() {
   try {
     return await axios.get(`${apiUrl}/users`, authConfig());
@@ -43,7 +40,6 @@ async function GetUsers() {
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้จาก ID (ต้องการ Token)
 async function GetUsersById(id: string) {
   try {
     return await axios.get(`${apiUrl}/user/${id}`, authConfig());
@@ -52,7 +48,6 @@ async function GetUsersById(id: string) {
   }
 }
 
-// ฟังก์ชันสำหรับอัปเดตข้อมูลผู้ใช้ (ต้องการ Token)
 async function UpdateUsersById(id: string, data: UsersInterface) {
   try {
     return await axios.put(`${apiUrl}/user/${id}`, data, authConfig());
@@ -61,7 +56,6 @@ async function UpdateUsersById(id: string, data: UsersInterface) {
   }
 }
 
-// ฟังก์ชันสำหรับลบข้อมูลผู้ใช้ (ต้องการ Token)
 async function DeleteUsersById(id: string) {
   try {
     return await axios.delete(`${apiUrl}/user/${id}`, authConfig());
@@ -70,7 +64,6 @@ async function DeleteUsersById(id: string) {
   }
 }
 
-// ฟังก์ชันสำหรับสร้างผู้ใช้ใหม่ (ไม่ต้องการ Token)
 async function CreateUser(data: UsersInterface) {
   try {
     return await axios.post(`${apiUrl}/signup`, data);
@@ -79,12 +72,40 @@ async function CreateUser(data: UsersInterface) {
   }
 }
 
-export {
-  SignIn,
-  GetGender,
-  GetUsers,
-  GetUsersById,
-  UpdateUsersById,
-  DeleteUsersById,
-  CreateUser,
-};
+// Nutrition APIs
+async function GetNutrition(date?: string) {
+  try {
+    const q = date ? `?date=${encodeURIComponent(date)}` : "";
+    return await axios.get(`${apiUrl}/api/nutrition${q}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpsertNutrition(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/nutrition`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+export { SignIn, GetGender, GetUsers, GetUsersById, UpdateUsersById, DeleteUsersById, CreateUser, GetNutrition, UpsertNutrition };
+
+// Nutrition services
+export async function getNutrition(date?: string) {
+  try {
+    const url = date ? `${apiUrl}/api/nutrition?date=${date}` : `${apiUrl}/api/nutrition`;
+    return await axios.get(url, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+export async function upsertNutrition(payload: NutritionData) {
+  try {
+    return await axios.post(`${apiUrl}/api/nutrition`, payload, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
