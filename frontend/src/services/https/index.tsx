@@ -40,7 +40,7 @@ async function GetGender() {
 
 async function GetUsers() {
   try {
-    return await axios.get(`${apiUrl}/users`, authConfig());
+    return await axios.get(`${apiUrl}/api/users`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -48,7 +48,7 @@ async function GetUsers() {
 
 async function GetUsersById(id: string) {
   try {
-    return await axios.get(`${apiUrl}/user/${id}`, authConfig());
+    return await axios.get(`${apiUrl}/api/user/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -56,7 +56,7 @@ async function GetUsersById(id: string) {
 
 async function UpdateUsersById(id: string, data: UsersInterface) {
   try {
-    return await axios.put(`${apiUrl}/user/${id}`, data, authConfig());
+    return await axios.put(`${apiUrl}/api/user/${id}`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -64,7 +64,7 @@ async function UpdateUsersById(id: string, data: UsersInterface) {
 
 async function DeleteUsersById(id: string) {
   try {
-    return await axios.delete(`${apiUrl}/user/${id}`, authConfig());
+    return await axios.delete(`${apiUrl}/api/user/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -81,7 +81,7 @@ async function CreateUser(data: UsersInterface) {
 // ================= Trainer APIs =================
 async function CreateTrainer(data: TrainerInterface) {
   try {
-    return await axios.post(`${apiUrl}/trainers`, data, authConfig());
+    return await axios.post(`${apiUrl}/api/trainers`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -89,7 +89,7 @@ async function CreateTrainer(data: TrainerInterface) {
 
 async function GetTrainers() {
   try {
-    return await axios.get(`${apiUrl}/trainers`, authConfig());
+    return await axios.get(`${apiUrl}/api/trainers`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -97,7 +97,7 @@ async function GetTrainers() {
 
 async function GetTrainerById(id: number) {
   try {
-    return await axios.get(`${apiUrl}/trainers/${id}`, authConfig());
+    return await axios.get(`${apiUrl}/api/trainers/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -105,7 +105,7 @@ async function GetTrainerById(id: number) {
 
 async function UpdateTrainerById(id: number, data: TrainerInterface) {
   try {
-    return await axios.put(`${apiUrl}/trainers/${id}`, data, authConfig());
+    return await axios.put(`${apiUrl}/api/trainers/${id}`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -113,7 +113,7 @@ async function UpdateTrainerById(id: number, data: TrainerInterface) {
 
 async function DeleteTrainerById(id: number) {
   try {
-    return await axios.delete(`${apiUrl}/trainers/${id}`, authConfig());
+    return await axios.delete(`${apiUrl}/api/trainers/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -122,7 +122,7 @@ async function DeleteTrainerById(id: number) {
 // ================= Trainer Schedule APIs =================
 async function CreateTrainerSchedule(data: ITrainerSchedule) {
   try {
-    return await axios.post(`${apiUrl}/trainer-schedules`, data, authConfig());
+    return await axios.post(`${apiUrl}/api/trainer-schedules`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -130,7 +130,7 @@ async function CreateTrainerSchedule(data: ITrainerSchedule) {
 
 async function GetTrainerSchedules() {
   try {
-    return await axios.get(`${apiUrl}/trainer-schedules`, authConfig());
+    return await axios.get(`${apiUrl}/api/trainer-schedules`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -138,7 +138,7 @@ async function GetTrainerSchedules() {
 
 async function GetTrainerScheduleById(id: number) {
   try {
-    return await axios.get(`${apiUrl}/trainer-schedules/${id}`, authConfig());
+    return await axios.get(`${apiUrl}/api/trainer-schedules/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -146,7 +146,7 @@ async function GetTrainerScheduleById(id: number) {
 
 async function UpdateTrainerScheduleById(id: number, data: ITrainerSchedule) {
   try {
-    return await axios.put(`${apiUrl}/trainer-schedules/${id}`, data, authConfig());
+    return await axios.put(`${apiUrl}/api/trainer-schedules/${id}`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -154,7 +154,7 @@ async function UpdateTrainerScheduleById(id: number, data: ITrainerSchedule) {
 
 async function DeleteTrainerScheduleById(id: number) {
   try {
-    return await axios.delete(`${apiUrl}/trainer-schedules/${id}`, authConfig());
+    return await axios.delete(`${apiUrl}/api/trainer-schedules/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -162,7 +162,7 @@ async function DeleteTrainerScheduleById(id: number) {
 
 async function GetTrainerSchedulesByDate(trainerId: number, dateStr: string) {
   try {
-    return await axios.get(`${apiUrl}/trainers/schedules/${trainerId}`, {
+    return await axios.get(`${apiUrl}/api/trainers/schedules/${trainerId}`, {
       params: { date: dateStr },
       ...authConfig(),
     });
@@ -173,7 +173,7 @@ async function GetTrainerSchedulesByDate(trainerId: number, dateStr: string) {
 
 async function GetTrainerSchedulesByTrainer(trainerID: number) {
   try {
-    return await axios.get(`${apiUrl}/trainer-schedules/allschedules/${trainerID}`, authConfig());
+    return await axios.get(`${apiUrl}/api/trainer-schedules/allschedules/${trainerID}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -183,7 +183,7 @@ async function GetTrainerSchedulesByTrainer(trainerID: number) {
 async function BookTrainerSchedule(schedule_id: number, user_id: number) {
   try {
     return await axios.post(
-      `${apiUrl}/train-bookings`,
+      `${apiUrl}/api/train-bookings`,
       {
         schedule_id,
         user_id,
@@ -199,7 +199,7 @@ async function BookTrainerSchedule(schedule_id: number, user_id: number) {
 
 async function CancelTrainBooking(bookingId: number) {
   try {
-    return await axios.delete(`${apiUrl}/train-bookings/${bookingId}`, authConfig());
+    return await axios.delete(`${apiUrl}/api/train-bookings/${bookingId}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -207,7 +207,7 @@ async function CancelTrainBooking(bookingId: number) {
 
 async function GetBookingsByUserId(userId: number) {
   try {
-    return await axios.get<TrainBookingInterface[]>(`${apiUrl}/train-bookings/user/${userId}`, authConfig());
+    return await axios.get<TrainBookingInterface[]>(`${apiUrl}/api/train-bookings/user/${userId}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -253,7 +253,7 @@ export async function UploadTrainerImage(id: number, file: File) {
   const formData = new FormData();
   formData.append("file", file);
 
-  return await axios.post(`${apiUrl}/trainers/${id}/upload`, formData, {
+  return await axios.post(`${apiUrl}/api/trainers/${id}/upload`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
       ...authConfig().headers,
