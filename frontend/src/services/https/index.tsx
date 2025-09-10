@@ -1,27 +1,27 @@
+// ================= Imports =================
+import axios, { type AxiosRequestConfig } from "axios";
+
 import type { UsersInterface } from "../../interface/IUser";
 import type { SignInInterface } from "../../interface/SignIn";
+import type { NutritionData } from "../../interface/Nutrition";
 import type { TrainerInterface } from "../../interface/ITrainer";
 import type { ITrainerSchedule } from "../../interface/ITrainerSchedule";
 import type { TrainBookingInterface } from "../../interface/ITrainBooking";
-//import dayjs from "dayjs"; // เพิ่ม import dayjs
 
-import axios, { type AxiosRequestConfig } from "axios";
-
-// กำหนด base URL สำหรับ API
+// ================= Config =================
 const apiUrl = "http://localhost:8000";
 
-// ฟังก์ชันสำหรับสร้าง config พร้อม token
 function authConfig(): AxiosRequestConfig {
   const token = localStorage.getItem("token");
   return {
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ ใช้ Bearer เสมอ
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   };
 }
 
-// ฟังก์ชันสำหรับ Login (ไม่ต้องการ Token)
+// ================= Auth & User APIs =================
 async function SignIn(data: SignInInterface) {
   try {
     return await axios.post(`${apiUrl}/signin`, data);
@@ -30,16 +30,14 @@ async function SignIn(data: SignInInterface) {
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลเพศ (ต้องการ Token)
 async function GetGender() {
   try {
-    return await axios.get(`${apiUrl}/genders`, authConfig());
+    return await axios.get(`${apiUrl}/genders`);
   } catch (e: any) {
     return e.response;
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมด (ต้องการ Token)
 async function GetUsers() {
   try {
     return await axios.get(`${apiUrl}/users`, authConfig());
@@ -48,7 +46,6 @@ async function GetUsers() {
   }
 }
 
-// ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้จาก ID (ต้องการ Token)
 async function GetUsersById(id: string) {
   try {
     return await axios.get(`${apiUrl}/user/${id}`, authConfig());
@@ -57,7 +54,6 @@ async function GetUsersById(id: string) {
   }
 }
 
-// ฟังก์ชันสำหรับอัปเดตข้อมูลผู้ใช้ (ต้องการ Token)
 async function UpdateUsersById(id: string, data: UsersInterface) {
   try {
     return await axios.put(`${apiUrl}/user/${id}`, data, authConfig());
@@ -66,7 +62,6 @@ async function UpdateUsersById(id: string, data: UsersInterface) {
   }
 }
 
-// ฟังก์ชันสำหรับลบข้อมูลผู้ใช้ (ต้องการ Token)
 async function DeleteUsersById(id: string) {
   try {
     return await axios.delete(`${apiUrl}/user/${id}`, authConfig());
@@ -75,7 +70,6 @@ async function DeleteUsersById(id: string) {
   }
 }
 
-// ฟังก์ชันสำหรับสร้างผู้ใช้ใหม่ (ไม่ต้องการ Token)
 async function CreateUser(data: UsersInterface) {
   try {
     return await axios.post(`${apiUrl}/signup`, data);
@@ -84,10 +78,10 @@ async function CreateUser(data: UsersInterface) {
   }
 }
 
-
+// ================= Trainer APIs =================
 async function CreateTrainer(data: TrainerInterface) {
   try {
-    return await axios.post(`${apiUrl}/trainers`, data, authConfig()); 
+    return await axios.post(`${apiUrl}/trainers`, data, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -101,9 +95,9 @@ async function GetTrainers() {
   }
 }
 
-async function DeleteTrainerById(id: number) {
+async function GetTrainerById(id: number) {
   try {
-    return await axios.delete(`${apiUrl}/trainers/${id}`, authConfig());
+    return await axios.get(`${apiUrl}/trainers/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -117,15 +111,15 @@ async function UpdateTrainerById(id: number, data: TrainerInterface) {
   }
 }
 
-async function GetTrainerById(id: number) {
+async function DeleteTrainerById(id: number) {
   try {
-    return await axios.get(`${apiUrl}/trainers/${id}`, authConfig());
+    return await axios.delete(`${apiUrl}/trainers/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
 }
 
-// ฟังก์ชันสำหรับสร้างตารางเทรน (ต้องการ Token)
+// ================= Trainer Schedule APIs =================
 async function CreateTrainerSchedule(data: ITrainerSchedule) {
   try {
     return await axios.post(`${apiUrl}/trainer-schedules`, data, authConfig());
@@ -134,7 +128,6 @@ async function CreateTrainerSchedule(data: ITrainerSchedule) {
   }
 }
 
-// ฟังก์ชันสำหรับดึงตารางเทรนทั้งหมด (ต้องการ Token)
 async function GetTrainerSchedules() {
   try {
     return await axios.get(`${apiUrl}/trainer-schedules`, authConfig());
@@ -143,7 +136,6 @@ async function GetTrainerSchedules() {
   }
 }
 
-// ฟังก์ชันสำหรับดึงตารางเทรนตาม ID (ต้องการ Token)
 async function GetTrainerScheduleById(id: number) {
   try {
     return await axios.get(`${apiUrl}/trainer-schedules/${id}`, authConfig());
@@ -152,7 +144,6 @@ async function GetTrainerScheduleById(id: number) {
   }
 }
 
-// ฟังก์ชันสำหรับอัปเดตตารางเทรนตาม ID (ต้องการ Token)
 async function UpdateTrainerScheduleById(id: number, data: ITrainerSchedule) {
   try {
     return await axios.put(`${apiUrl}/trainer-schedules/${id}`, data, authConfig());
@@ -161,37 +152,12 @@ async function UpdateTrainerScheduleById(id: number, data: ITrainerSchedule) {
   }
 }
 
-// ฟังก์ชันสำหรับลบตารางเทรนตาม ID (ต้องการ Token)
 async function DeleteTrainerScheduleById(id: number) {
   try {
     return await axios.delete(`${apiUrl}/trainer-schedules/${id}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
-}
-
-export async function UploadTrainerImage(id: number, file: File) {
-  const formData = new FormData();
-  formData.append("file", file); // ✅ เปลี่ยน key เป็น "file" ให้ตรงกับ Backend
-
-  return await axios.post(`${apiUrl}/trainers/${id}/upload`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      ...authConfig().headers, // ✅ Endpoint นี้ต้องการ Token
-    },
-  });
-}
-
-async function UploadImage(file: File) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  return await axios.post(`${apiUrl}/upload`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      // ✅ ลบ authConfig().headers ออก เพื่อไม่ให้ส่ง Token ไปยัง Endpoint ที่ไม่ต้องการ0
-    },
-  });
 }
 
 async function GetTrainerSchedulesByDate(trainerId: number, dateStr: string) {
@@ -205,15 +171,22 @@ async function GetTrainerSchedulesByDate(trainerId: number, dateStr: string) {
   }
 }
 
-// ฟังก์ชันใหม่สำหรับจองตารางเวลา
+async function GetTrainerSchedulesByTrainer(trainerID: number) {
+  try {
+    return await axios.get(`${apiUrl}/trainer-schedules/allschedules/${trainerID}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Booking APIs =================
 async function BookTrainerSchedule(schedule_id: number, user_id: number) {
   try {
-    console.log("BookTrainerSchedule payload:", { schedule_id, user_id });
     return await axios.post(
       `${apiUrl}/train-bookings`,
       {
-        schedule_id: schedule_id,
-        user_id: user_id,   
+        schedule_id,
+        user_id,
         booking_status: "Booked",
         booking_date: new Date().toISOString(),
       },
@@ -224,7 +197,6 @@ async function BookTrainerSchedule(schedule_id: number, user_id: number) {
   }
 }
 
-// ฟังก์ชันใหม่สำหรับยกเลิกการจอง
 async function CancelTrainBooking(bookingId: number) {
   try {
     return await axios.delete(`${apiUrl}/train-bookings/${bookingId}`, authConfig());
@@ -233,28 +205,76 @@ async function CancelTrainBooking(bookingId: number) {
   }
 }
 
-
-// ฟังก์ชันสำหรับดึงข้อมูลการจองของ User (ต้องการ Token)
 async function GetBookingsByUserId(userId: number) {
   try {
-    return await axios.get<TrainBookingInterface[]>(
-      `${apiUrl}/train-bookings/user/${userId}`,
-      authConfig()
-    );
+    return await axios.get<TrainBookingInterface[]>(`${apiUrl}/train-bookings/user/${userId}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
 }
 
-async function GetTrainerSchedulesByTrainer(trainerID: number) {
+// ================= Nutrition APIs =================
+async function GetNutrition(date?: string) {
   try {
-    return await axios.get(`${apiUrl}/trainer-schedules/allschedules/${trainerID}`, authConfig());
+    const q = date ? `?date=${encodeURIComponent(date)}` : "";
+    return await axios.get(`${apiUrl}/api/nutrition${q}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
 }
 
+async function UpsertNutrition(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/nutrition`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+export async function getNutrition(date?: string) {
+  try {
+    const url = date ? `${apiUrl}/api/nutrition?date=${date}` : `${apiUrl}/api/nutrition`;
+    return await axios.get(url, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+export async function upsertNutrition(payload: NutritionData) {
+  try {
+    return await axios.post(`${apiUrl}/api/nutrition`, payload, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= File Upload APIs =================
+export async function UploadTrainerImage(id: number, file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return await axios.post(`${apiUrl}/trainers/${id}/upload`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      ...authConfig().headers,
+    },
+  });
+}
+
+async function UploadImage(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return await axios.post(`${apiUrl}/upload`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+// ================= Exports =================
 export {
+  // Users
   SignIn,
   GetGender,
   GetUsers,
@@ -262,20 +282,32 @@ export {
   UpdateUsersById,
   DeleteUsersById,
   CreateUser,
+
+  // Trainers
   CreateTrainer,
   GetTrainers,
-  DeleteTrainerById,
-  UpdateTrainerById,
   GetTrainerById,
+  UpdateTrainerById,
+  DeleteTrainerById,
+
+  // Trainer Schedules
   CreateTrainerSchedule,
   GetTrainerSchedules,
   GetTrainerScheduleById,
   UpdateTrainerScheduleById,
   DeleteTrainerScheduleById,
-  UploadImage,
   GetTrainerSchedulesByDate,
+  GetTrainerSchedulesByTrainer,
+
+  // Booking
   BookTrainerSchedule,
   CancelTrainBooking,
   GetBookingsByUserId,
-  GetTrainerSchedulesByTrainer,
+
+  // Nutrition
+  GetNutrition,
+  UpsertNutrition,
+
+  // Uploads
+  UploadImage,
 };
