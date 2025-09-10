@@ -10,9 +10,11 @@ import SignUpPage from "../pages/auth/Register";
 // Routes สำหรับลูกค้า (Customer)
 import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/classHome";
-import TrainerBooking from "../pages/trainer/trainer/trainerbooking";
-import Health from "../pages/health/Health/HealthHome";
-import Activity from "../pages/health/Activity/ActivityHome";
+
+import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
+import HealthHome from "../pages/health/Health/healthHome";
+import Nutrition from "../pages/health/nutrition/nutritionHome";
+
 import Group from "../pages/group/groupHome";
 import Package from "../pages/package/packageHome";
 import Customer from "../pages/customer";
@@ -34,6 +36,10 @@ import BookTrainSchedule from "../pages/trainer/trainer/BookTrainSchedule";
 import ManageSchedule from "../pages/admin/class-activity/class-activityHome";
 import ManageEquipment from "../pages/admin/equipment/equipmentHome";
 import UserList from "../pages/admin/List/userlist";
+import { HealthActivityProvider } from "../contexts/HealthContext";
+import { NutritionProvider } from "../contexts/NutritionContext";
+
+
 
 const ConfigRoutes: React.FC = () => {
   return (
@@ -56,9 +62,18 @@ const ConfigRoutes: React.FC = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/trainerbooking" element={<TrainerBooking />} />
-        <Route path="/health" element={<Health />} />
-        <Route path="/health/Health" element={<Health />} />
-        <Route path="/health/Activity" element={<Activity />} />
+        <Route path="/health/Health" element={
+          <HealthActivityProvider>
+            <HealthHome />
+          </HealthActivityProvider>
+        } />
+        <Route path="/health/nutrition" element={
+          <HealthActivityProvider>
+            <NutritionProvider>
+              <Nutrition />
+            </NutritionProvider>
+          </HealthActivityProvider>
+        } />
         <Route path="/group" element={<Group />} />
         <Route path="/package" element={<Package />} />
         <Route path="/customer" element={<Customer />} />
