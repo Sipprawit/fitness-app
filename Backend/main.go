@@ -17,6 +17,12 @@ import (
 
    "example.com/fitness-backend/middlewares"
 
+   "example.com/fitness-backend/controllers/Trainer"
+   
+   "example.com/fitness-backend/controllers/TrainerSchedule"
+
+   "example.com/fitness-backend/controllers/TrainBooking" 
+
 )
 
 
@@ -38,8 +44,9 @@ func main() {
 
    r := gin.Default()
 
-
    r.Use(CORSMiddleware())
+   
+   r.Static("/uploads", "./uploads")
 
 
    // Auth Route
@@ -47,6 +54,8 @@ func main() {
    r.POST("/signup", users.SignUp)
 
    r.POST("/signin", users.SignIn)
+
+   r.POST("/upload", Trainer.UploadFile)
 
 
    router := r.Group("/")
@@ -59,13 +68,33 @@ func main() {
        // User Route
 
        router.PUT("/user/:id", users.Update)
-
        router.GET("/users", users.GetAll)
-
        router.GET("/user/:id", users.Get)
-
        router.DELETE("/user/:id", users.Delete)
 
+       //Trainer Routes
+       
+       router.POST("/trainers", Trainer.CreateTrainer)
+       router.GET("/trainers", Trainer.GetTrainers)
+       router.GET("/trainers/:id", Trainer.GetTrainerByID)
+       router.PUT("/trainers/:id", Trainer.UpdateTrainer)
+       router.DELETE("/trainers/:id", Trainer.DeleteTrainer)
+       router.POST("/trainers/:id/upload", Trainer.UploadFile)
+
+       // TrainerSchedule Routes
+       
+       router.POST("/trainer-schedules", TrainerSchedule.CreateTrainerSchedule)
+       router.GET("/trainer-schedules", TrainerSchedule.GetTrainerSchedules)
+       router.GET("/trainer-schedules/:id", TrainerSchedule.GetTrainerScheduleByID)
+       router.GET("/trainer-schedules/allschedules/:trainerID", TrainerSchedule.GetTrainerSchedulesByTrainerID)
+       router.PUT("/trainer-schedules/:id", TrainerSchedule.UpdateTrainerSchedule)
+       router.DELETE("/trainer-schedules/:id", TrainerSchedule.DeleteTrainerSchedule)
+       router.GET("/trainers/schedules/:trainerId", TrainerSchedule.GetTrainerSchedulesByDate)
+
+       // TrainBooking Routes
+       router.POST("/train-bookings", TrainBooking.CreateTrainBooking)
+       router.GET("/train-bookings/user/:userID", TrainBooking.GetUserBookings)
+       router.DELETE("/train-bookings/:id", TrainBooking.CancelTrainBooking)
 
    }
 
