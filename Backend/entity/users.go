@@ -25,6 +25,9 @@ type Users struct {
 	Gender    *Genders `gorm:"foreignKey:GenderID" json:"gender"`
 	
 	Healths   []Health `gorm:"foreignKey:UserID"` // ใช้ UserID ใน Health
+
+	// ความสัมพันธ์กับการจองเทรนเนอร์ของผู้ใช้
+	TrainBookings []TrainBooking `gorm:"foreignKey:UsersID" json:"train_bookings"`
 }
 
 
