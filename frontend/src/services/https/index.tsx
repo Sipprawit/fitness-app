@@ -213,6 +213,7 @@ async function GetBookingsByUserId(userId: number) {
   }
 }
 
+
 // ================= Nutrition APIs =================
 async function GetNutrition(date?: string) {
   try {
