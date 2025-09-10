@@ -11,9 +11,11 @@ type Nutrition struct {
 	Date                string  `json:"date"` // YYYY-MM-DD
 	Goal                string  `json:"goal"`
 	TotalCaloriesPerDay float64 `json:"total_calories_per_day"`
-	ProteinG            float64 `json:"protein_g"` // เปอร์เซ็นต์โปรตีนต่อวัน
-	FatG                float64 `json:"fat_g"`     // เปอร์เซ็นต์ไขมันต่อวัน
-	CarbG               float64 `json:"carb_g"`    // เปอร์เซ็นต์คาร์โบไฮเดรตต่อวัน
+	ProteinG            float64 `json:"protein_g"`
+	FatG                float64 `json:"fat_g"`
+	CarbG               float64 `json:"carb_g"`
 	Note                string  `json:"note"`
-	
+
+	// Meals relation for Preload("Meals")
+	Meals               []Meal  `json:"meals" gorm:"foreignKey:NutritionID"`
 }
