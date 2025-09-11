@@ -37,13 +37,6 @@ function ActivityForm({ activitiesList }: Props) {
     console.log("Health type:", typeof health);
     console.log("=== End useEffect ===");
   }, [health]);
-  
-  // รีเซ็ตระยะทางเมื่อเปลี่ยนประเภทกิจกรรม
-  useEffect(() => {
-    if (!needsDistance) {
-      setDistance(0);
-    }
-  }, [type, needsDistance]);
 
   const handleSubmit = async () => {
     // Debug: ตรวจสอบข้อมูล health
@@ -191,18 +184,16 @@ function ActivityForm({ activitiesList }: Props) {
           </select>
         </div>
 
-        {needsDistance && (
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>📏 ระยะทาง (กม.)</label>
-            <input
-              type="text"
-              value={distance === 0 ? "" : distance}
-              onChange={(e) => setDistance(Number(e.target.value) || 0)}
-              style={inputStyle}
-              placeholder="เช่น 5"
-            />
-          </div>
-        )}
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>📏 ระยะทาง (กม.)</label>
+          <input
+            type="text"
+            value={distance === 0 ? "" : distance}
+            onChange={(e) => setDistance(Number(e.target.value) || 0)}
+            style={inputStyle}
+            placeholder="เช่น 5"
+          />
+        </div>
 
         <div style={inputGroupStyle}>
           <label style={labelStyle}>⏱️ เวลา (นาที)</label>

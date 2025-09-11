@@ -191,18 +191,16 @@ function ActivityForm({ activitiesList }: Props) {
           </select>
         </div>
 
-        {needsDistance && (
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>📏 ระยะทาง (กม.)</label>
-            <input
-              type="text"
-              value={distance === 0 ? "" : distance}
-              onChange={(e) => setDistance(Number(e.target.value) || 0)}
-              style={inputStyle}
-              placeholder="เช่น 5"
-            />
-          </div>
-        )}
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>📏 ระยะทาง (กม.)</label>
+          <input
+            type="text"
+            value={distance === 0 ? "" : distance}
+            onChange={(e) => setDistance(Number(e.target.value) || 0)}
+            style={inputStyle}
+            placeholder="เช่น 5"
+          />
+        </div>
 
         <div style={inputGroupStyle}>
           <label style={labelStyle}>⏱️ เวลา (นาที)</label>

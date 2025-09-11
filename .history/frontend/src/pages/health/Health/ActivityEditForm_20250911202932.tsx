@@ -97,18 +97,16 @@ export default function ActivityEditForm({ activity, onSave, onCancel }: Props) 
         </div>
 
         {/* Distance */}
-        {needsDistance && (
-          <div>
-            <label style={labelStyle}>📏 ระยะทาง (กิโลเมตร)</label>
-            <input
-              type="text"
-              value={distance === 0 ? "" : distance}
-              onChange={(e) => setDistance(Number(e.target.value) || 0)}
-              style={inputStyle}
-              placeholder="เช่น 5"
-            />
-          </div>
-        )}
+        <div>
+          <label style={labelStyle}>📏 ระยะทาง (กิโลเมตร)</label>
+          <input
+            type="text"
+            value={distance === 0 ? "" : distance}
+            onChange={(e) => setDistance(Number(e.target.value) || 0)}
+            style={inputStyle}
+            placeholder="เช่น 5"
+          />
+        </div>
 
         {/* Duration */}
         <div>
