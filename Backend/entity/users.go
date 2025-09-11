@@ -4,23 +4,30 @@ import (
     "gorm.io/gorm"
 )
 
+// Customer model
 type Users struct {
-    gorm.Model
-    FirstName string   `json:"first_name"`  // ใช้ json tag ให้ตรงกับ API
+	gorm.Model
+	
+	FirstName string   `json:"first_name"`
 
-    LastName  string   `json:"last_name"`
+	LastName  string   `json:"last_name"`
 
-    Email     string   `json:"email"`
+	Email     string   `gorm:"uniqueIndex" json:"email"`
 
-    Age       uint8    `json:"age"`
+	Age       uint8    `json:"age"`
 
-    Password  string   `json:"-"`           // ไม่ต้องส่ง password กลับ
+	Password  string   `json:"-"`
 
-    BirthDay  string   `json:"birthDay"`
+	BirthDay  string   `json:"birthday"`
 
-    GenderID  uint     `json:"gender_id"`
+	GenderID  uint     `json:"gender_id"`
 
-    Gender    *Genders `gorm:"foreignKey:GenderID" json:"gender"`
-    
-    Actor     string   `json:"actor"`       // บทบาท
+	Gender    *Genders `gorm:"foreignKey:GenderID" json:"gender"`
+	
+	Healths   []Health `gorm:"foreignKey:UserID"` // ใช้ UserID ใน Health
+
+	// ความสัมพันธ์กับการจองเทรนเนอร์ของผู้ใช้
+	TrainBookings []TrainBooking `gorm:"foreignKey:UsersID" json:"train_bookings"`
 }
+
+

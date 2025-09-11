@@ -39,7 +39,7 @@ const ClassDetailPage: React.FC = () => {
 
     
     const handleGoBack = () => {
-        navigate('/admin/schedule');
+        navigate('/admin/classes');
     };
 
     if (loading) return <div>กำลังโหลด...</div>;

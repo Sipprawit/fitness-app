@@ -1,22 +1,19 @@
 export interface UsersInterface {
+  id?: number;
 
-  ID?: number;
+  first_name?: string;
 
-  FirstName?: string;
+  last_name?: string;
 
-  LastName?: string;
+  email?: string;
 
-  Email?: string;
+  password?: string;
 
-  Phone?: string;
+  age?: number;
 
-  Age?: number;
+  birthday?: string;
 
-  BirthDay?: string;
+  gender_id?: number;
 
-  GenderID?: number;
-
-  Password?: string;
-
-  Actor?: string
+  actor?: string;
 }

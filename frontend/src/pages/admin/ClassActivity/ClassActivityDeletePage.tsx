@@ -34,7 +34,7 @@ const ClassActivityDeletePage: React.FC = () => {
         if (!id) return;
         try {
             await deleteClass(parseInt(id, 10));
-            navigate('/admin/schedule');
+            navigate('/admin/classes');
         } catch (error) {
             console.error('Failed to delete class:', error);
             alert('ไม่สามารถลบข้อมูลได้');
@@ -52,7 +52,7 @@ const ClassActivityDeletePage: React.FC = () => {
                     <h2 className="delete-title">ยืนยันการลบ</h2>
                     <p className="delete-message">คุณต้องการลบ {className} หรือไม่?</p>
                     <div className="delete-actions">
-                        <button onClick={() => navigate('/admin/schedule')} className="back-button">ยกเลิก</button>
+                        <button onClick={() => navigate('/admin/classes')} className="back-button">ยกเลิก</button>
                         <button onClick={handleDelete} className="delete-button-confirm">ลบ</button>
                     </div>
                 </div>

@@ -35,7 +35,7 @@ function SignInPages() {
       if (actor === 'trainer') {
         redirectPath = "/trainer";
       } else if (actor === 'admin') {
-        redirectPath = "/admin/schedule";
+        redirectPath = "/admin/classes";
       }
 
       setTimeout(() => {

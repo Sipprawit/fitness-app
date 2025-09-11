@@ -9,9 +9,11 @@ import SignUpPage from "../pages/auth/Register";
 
 // Routes สำหรับลูกค้า (Customer)
 import Dashboard from "../pages/dashboard";
+import Booking from "../pages/classbooking/ClassHome";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
-import Health from "../pages/health/Health/HealthHome";
-import Activity from "../pages/health/Activity/ActivityHome";
+import HealthHome from "../pages/health/Health/HealthHome";
+import Nutrition from "../pages/health/nutrition/nutritionHome";
+
 import Group from "../pages/group/groupHome";
 import Package from "../pages/package/packageHome";
 import Customer from "../pages/customer";
@@ -22,6 +24,12 @@ import CustomerEdit from "../pages/admin/List/edit";
 import TrainerDashboard from "../pages/trainer/Actor/trainerHome";
 import CreateProgram from "../pages/trainer/Actor/personal-training/personalHome";
 import TrainerProfile from "../pages/trainer/Actor/trainerProfile";
+import AddTrainer from "../pages/trainer/Actor/addTrainer";
+import EditTrainer from "../pages/trainer/Actor/editTrainer";
+import TrainerSchedule from "../pages/trainer/Actor/TrainerSchedule";
+import AddTrainerSchedule from "../pages/trainer/Actor/addTrainerSchedule";
+import TrainerDetail from "../pages/trainer/trainer/trainerDetail";
+import BookTrainSchedule from "../pages/trainer/trainer/BookTrainSchedule";
 
 // Routes สำหรับแอดมิน (Admin)
 import ManageSchedule from "../pages/admin/ClassActivity/ClassActivityListPage";
@@ -32,6 +40,9 @@ import EquipmentFacilityForm from "../pages/admin/EquipmentFacility/EquipmentFac
 import EquipmentFacilityDelete from "../pages/admin/EquipmentFacility/EquipmentFacilityDeletePage";
 import UserList from "../pages/admin/List/userlist";
 import ClassDetailPage from "../pages/admin/ClassActivity/ClassDetailPage";
+import { HealthActivityProvider } from "../contexts/HealthContext";
+import { NutritionProvider } from "../contexts/NutritionContext";
+
 
 
 const ConfigRoutes: React.FC = () => {
@@ -43,27 +54,52 @@ const ConfigRoutes: React.FC = () => {
                 <Route path="/signup" element={<SignUpPage />} />
             </Route>
 
-            {/* หน้าที่ต้องป้องกัน (ต้อง Login) ใช้งาน FullLayout */}
-            <Route element={<PrivateRoute><FullLayout /></PrivateRoute>}>
-                {/* --- Routes สำหรับลูกค้า (Customer) --- */}
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/trainerbooking" element={<TrainerBooking />} />
-                <Route path="/health" element={<Health />} />
-                <Route path="/health/Health" element={<Health />} />
-                <Route path="/health/Activity" element={<Activity />} />
-                <Route path="/group" element={<Group />} />
-                <Route path="/package" element={<Package />} />
-                <Route path="/customer" element={<Customer />} />
-                <Route path="/customer/create" element={<CustomerCreate />} />
-                <Route path="/customer/edit/:id" element={<CustomerEdit />} />
+      {/* หน้าที่ต้องป้องกัน (ต้อง Login) ใช้งาน FullLayout */}
+      <Route
+        element={
+          <PrivateRoute>
+            <FullLayout />
+          </PrivateRoute>
+        }
+      >
+        {/* --- Routes สำหรับลูกค้า (Customer) --- */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/trainerbooking" element={<TrainerBooking />} />
+        <Route path="/health/Health" element={
+          <HealthActivityProvider>
+            <HealthHome />
+          </HealthActivityProvider>
+        } />
+        <Route path="/health/nutrition" element={
+          <HealthActivityProvider>
+            <NutritionProvider>
+              <Nutrition />
+            </NutritionProvider>
+          </HealthActivityProvider>
+        } />
+        <Route path="/group" element={<Group />} />
+        <Route path="/package" element={<Package />} />
+        <Route path="/customer" element={<Customer />} />
+        <Route path="/customer/create" element={<CustomerCreate />} />
+        <Route path="/customer/edit/:id" element={<CustomerEdit />} />
+        <Route path="/trainers/:id" element={<TrainerDetail />} />
+        <Route path="/trainers/:id/train-bookings" element={<BookTrainSchedule />} />
 
-                {/* --- Routes สำหรับเทรนเนอร์ (Trainer) --- */}
-                <Route path="/trainer" element={<TrainerDashboard />} />
-                <Route path="/trainer/create-program" element={<CreateProgram />} />
-                <Route path="/trainer/profile" element={<TrainerProfile />} />
-                
-                {/* --- Routes สำหรับแอดมิน (Admin) --- */}
-                <Route path="/admin/schedule" element={<ManageSchedule />} />
+        {/* --- Routes สำหรับเทรนเนอร์ (Trainer) --- */}
+        <Route path="/trainer" element={<TrainerDashboard />} />
+        <Route path="/trainer/create-program" element={<CreateProgram />} />
+        <Route path="/trainer/profile" element={<TrainerProfile />} />
+        <Route path="/trainer/profile/addTrainer" element={<AddTrainer />} />
+        <Route path="/trainer/edit/:id" element={<EditTrainer />} />
+        <Route path="/trainer/:id/schedule" element={<TrainerSchedule />} />
+        <Route
+          path="/trainer/:id/schedule/addTrainerSchedule"
+          element={<AddTrainerSchedule />}
+        />
+
+        {/* --- Routes สำหรับแอดมิน (Admin) --- */}
+                <Route path="/admin/classes" element={<ManageSchedule />} />
                 
                 {/* --- เพิ่ม Route สำหรับหน้ารายละเอียดคลาส --- */}
                 <Route path="/class/detail/:id" element={<ClassDetailPage />} />

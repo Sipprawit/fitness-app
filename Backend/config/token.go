@@ -5,29 +5,23 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// claims เป็นโครงสร้างสำหรับข้อมูลใน JWT token
 type claims struct {
-	UserID uint   `json:"userId"`
-	Email  string `json:"email"`
+	UserID uint   `json:"user_id"`
+	Email string `json:"email"`
+	Actor string `json:"actor"` // <-- เพิ่ม Actor
 	jwt.StandardClaims
 }
 
-// GenerateToken สร้าง JWT token ใหม่สำหรับผู้ใช้ที่กำหนด
-func GenerateToken(userID uint, email string, expirationTime time.Time) (string, error) {
+func GenerateToken(id uint, email string, actor string, expirationTime time.Time) (string, error) { // <-- เพิ่ม actor
 	claims := &claims{
-		UserID: userID,
-		Email:  email,
+		UserID: id,
+		Email: email,
+		Actor: actor, // <-- เพิ่ม Actor
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// ✅ ใช้ SecretKey จาก ConnectionDB.go
-	tokenString, err := token.SignedString([]byte(SecretKey))
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
+	return token.SignedString([]byte(SecretKey))
 }

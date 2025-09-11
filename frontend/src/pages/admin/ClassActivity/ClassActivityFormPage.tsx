@@ -104,7 +104,7 @@ const ClassActivityFormPage: React.FC = () => {
             } else {
                 await createClass(submissionData as any);
             }
-            navigate('/admin/schedule');
+            navigate('/admin/classes');
         } catch (error) {
             console.error("Failed to save class:", error);
             alert("ไม่สามารถบันทึกข้อมูลได้");
@@ -172,7 +172,7 @@ const ClassActivityFormPage: React.FC = () => {
                     {renderImageInput()}
                     
                     <div className="form-actions-bottom">
-                        <button type="button" onClick={() => navigate('/admin/schedule')} className="back-button">ยกเลิก</button>
+                        <button type="button" onClick={() => navigate('/admin/classes')} className="back-button">ยกเลิก</button>
                         <button type="submit" className="save-button">{isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'เพิ่ม'}</button>
                     </div>
                 </form>
