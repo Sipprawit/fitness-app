@@ -10,6 +10,7 @@ import SignUpPage from "../pages/auth/Register";
 // Routes สำหรับลูกค้า (Customer)
 import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/ClassHome";
+import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
 import HealthHome from "../pages/health/Health/HealthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
@@ -26,10 +27,10 @@ import CreateProgram from "../pages/trainer/Actor/personal-training/personalHome
 import TrainerProfile from "../pages/trainer/Actor/trainerProfile";
 import AddTrainer from "../pages/trainer/Actor/addTrainer";
 import EditTrainer from "../pages/trainer/Actor/editTrainer";
-import TrainerSchedule from "../pages/trainer/Actor/TrainerSchedule";
 import AddTrainerSchedule from "../pages/trainer/Actor/addTrainerSchedule";
 import TrainerDetail from "../pages/trainer/trainer/trainerDetail";
 import BookTrainSchedule from "../pages/trainer/trainer/BookTrainSchedule";
+import BookTrainHistory from "../pages/trainer/trainer/BookTrainHistory";
 
 // Routes สำหรับแอดมิน (Admin)
 import ManageSchedule from "../pages/admin/ClassActivity/ClassActivityListPage";
@@ -65,6 +66,8 @@ const ConfigRoutes: React.FC = () => {
         {/* --- Routes สำหรับลูกค้า (Customer) --- */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/booking" element={<Booking />} />
+        <Route path="/class" element={<Booking />} />
+        <Route path="/class/booking-history" element={<BookClass />} />
         <Route path="/trainerbooking" element={<TrainerBooking />} />
         <Route path="/health/Health" element={
           <HealthActivityProvider>
@@ -85,6 +88,7 @@ const ConfigRoutes: React.FC = () => {
         <Route path="/customer/edit/:id" element={<CustomerEdit />} />
         <Route path="/trainers/:id" element={<TrainerDetail />} />
         <Route path="/trainers/:id/train-bookings" element={<BookTrainSchedule />} />
+        <Route path="/trainer-booking-history" element={<BookTrainHistory />} />
 
         {/* --- Routes สำหรับเทรนเนอร์ (Trainer) --- */}
         <Route path="/trainer" element={<TrainerDashboard />} />
@@ -92,7 +96,6 @@ const ConfigRoutes: React.FC = () => {
         <Route path="/trainer/profile" element={<TrainerProfile />} />
         <Route path="/trainer/profile/addTrainer" element={<AddTrainer />} />
         <Route path="/trainer/edit/:id" element={<EditTrainer />} />
-        <Route path="/trainer/:id/schedule" element={<TrainerSchedule />} />
         <Route
           path="/trainer/:id/schedule/addTrainerSchedule"
           element={<AddTrainerSchedule />}

@@ -61,6 +61,7 @@ func SetupDatabase() {
 		&entity.Meal{},
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
+		&entity.ClassBooking{},
 	)
 
 	// Seed genders (idempotent)

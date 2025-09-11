@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CreateTrainerSchedule, GetTrainerById } from "../../../services/https";
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import dayjs, { Dayjs } from "dayjs";
@@ -39,7 +39,7 @@ function AddTrainerSchedule() {
         content: "ไม่พบข้อมูลเทรนเนอร์",
       });
       setTimeout(() => {
-        navigate("/trainer/profile");
+        navigate("/trainer");
       }, 2000);
     }
   };
@@ -78,7 +78,7 @@ function AddTrainerSchedule() {
       });
       form.resetFields();
       setTimeout(() => {
-        navigate(`/trainer/${trainer?.ID}/schedule`);
+        navigate("/trainer");
       }, 1000);
     } else {
       messageApi.open({
@@ -104,7 +104,7 @@ function AddTrainerSchedule() {
         content: "ไม่พบ TrainerID ใน URL! กำลังกลับสู่หน้าหลัก...",
       });
       setTimeout(() => {
-        navigate("/trainer/profile");
+        navigate("/trainer");
       }, 2000);
     }
   }, [id]);
@@ -180,11 +180,13 @@ function AddTrainerSchedule() {
             <Col style={{ marginTop: "40px" }}>
               <Form.Item>
                 <Space>
-                  <Link to={`/trainer/${id}/schedule`}>
-                    <Button htmlType="button" style={{ marginRight: "10px" }}>
-                      ยกเลิก
-                    </Button>
-                  </Link>
+                  <Button 
+                    htmlType="button" 
+                    style={{ marginRight: "10px" }}
+                    onClick={() => navigate("/trainer")}
+                  >
+                    ยกเลิก
+                  </Button>
                   <Button
                     type="primary"
                     htmlType="submit"

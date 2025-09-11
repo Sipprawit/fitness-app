@@ -19,8 +19,13 @@ func GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
+	// คำนวณจำนวนผู้เข้าร่วมปัจจุบันจากการจองที่ยังไม่ถูกยกเลิก
 	for i := range items {
-		items[i].CurrentParticipants = 0
+		var count int64
+		db.Model(&entity.ClassBooking{}).
+			Where("class_activity_id = ? AND status <> ?", items[i].ID, "Cancelled").
+			Count(&count)
+		items[i].CurrentParticipants = int(count)
 	}
 	c.JSON(http.StatusOK, items)
 }
@@ -34,7 +39,12 @@ func Get(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
-	item.CurrentParticipants = 0
+	// คำนวณจำนวนผู้เข้าร่วมปัจจุบันจากการจองที่ยังไม่ถูกยกเลิก
+	var count int64
+	db.Model(&entity.ClassBooking{}).
+		Where("class_activity_id = ? AND status <> ?", item.ID, "Cancelled").
+		Count(&count)
+	item.CurrentParticipants = int(count)
 	c.JSON(http.StatusOK, item)
 }
 

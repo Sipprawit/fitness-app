@@ -40,14 +40,14 @@ function CustomerCreate() {
   const onFinish = async (values: any) => {
     // แปลงค่า field ให้ตรง backend
     const payload: UsersInterface = {
-      FirstName: values.first_name,
-      LastName: values.last_name,
-      Email: values.email,
-      Password: values.password,
-      BirthDay: values.birthday?.format("YYYY-MM-DD") || "",
-      Age: values.age,
-      GenderID: values.gender_id,
-      Actor: "admin", // กำหนดบทบาท
+      first_name: values.first_name,
+      last_name: values.last_name,
+      email: values.email,
+      password: values.password,
+      birthday: values.birthday?.format("YYYY-MM-DD") || "",
+      age: values.age,
+      gender_id: values.gender_id,
+      actor: "admin", // กำหนดบทบาท
     };
 
     const res = await CreateUser(payload);
