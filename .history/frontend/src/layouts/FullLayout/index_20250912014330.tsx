@@ -243,7 +243,7 @@ const FullLayout: React.FC = () => {
 
             <Menu
               style={{ backgroundColor: "#C50000" }}
-              defaultSelectedKeys={[page ? page : "booking"]}
+              defaultSelectedKeys={[page ? page : "dashboard"]}
               mode="inline"
             >
               {menuItems}
