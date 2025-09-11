@@ -6,8 +6,16 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const token = localStorage.getItem("token"); // ตรวจสอบ token ที่ login เซฟไว้
-  return token ? children : <Navigate to="/login" replace />;
+  const token = localStorage.getItem("token");
+  const isLogin = localStorage.getItem("isLogin");
+  
+  // ตรวจสอบทั้ง token และ isLogin flag
+  if (token && isLogin === "true") {
+    return children;
+  }
+  
+  // ถ้าไม่มี token หรือ isLogin ไม่ใช่ true ให้ redirect ไป login
+  return <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

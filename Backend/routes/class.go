@@ -17,6 +17,6 @@ func ClassRoutes(api *gin.RouterGroup) {
 
 // PublicRoutes สำหรับ routes ที่ไม่ต้องใช้ authentication
 func PublicClassRoutes(r *gin.Engine) {
-	// Public upload route for images
-	r.POST("/upload", classactivity.UploadImage)
+	// Public routes ที่ไม่ต้องใช้ authentication
+	// (upload route ถูกจัดการใน main.go แล้ว)
 }

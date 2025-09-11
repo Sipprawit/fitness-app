@@ -14,7 +14,6 @@ import {
 } from "antd";
 import { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import type { UsersInterface } from "../../../../interface/IUser";
 import type { GenderInterface } from "../../../../interface/Gender";
 import { GetGender, CreateUser } from "../../../../services/https";
 import { useNavigate } from "react-router-dom";
@@ -38,19 +37,20 @@ function CustomerCreate() {
 
   // Submit form
   const onFinish = async (values: any) => {
-    // แปลงค่า field ให้ตรง backend
-    const payload: UsersInterface = {
-      FirstName: values.first_name,
-      LastName: values.last_name,
-      Email: values.email,
-      Password: values.password,
-      BirthDay: values.birthday?.format("YYYY-MM-DD") || "",
-      Age: values.age,
-      GenderID: values.gender_id,
-      Actor: "admin", // กำหนดบทบาท
+    // แปลงค่า field ให้ตรง backend (ใช้ field names ที่ backend ต้องการ)
+    const payload = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      email: values.email,
+      password: values.password,
+      birthday: values.birthday?.format("YYYY-MM-DD") || "",
+      age: values.age,
+      gender_id: values.gender_id,
     };
 
+    console.log("Payload being sent to API:", payload);
     const res = await CreateUser(payload);
+    console.log("API Response:", res);
 
     if (res.status === 200 || res.status === 201) {
       messageApi.open({ type: "success", content: res.data.message });
