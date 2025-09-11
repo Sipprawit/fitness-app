@@ -35,7 +35,7 @@ const   ClassActivityListPage: React.FC = () => {
 
     // ฟังก์ชันใหม่สำหรับจัดการเมื่อคลิกที่การ์ดคลาส
     const handleClassClick = (id: number) => {
-        navigate(`/class/detail/${id}`);
+        navigate(`/admin/class/detail/${id}`);
     };
 
     const handleAdd = () => navigate('/class/add');

@@ -205,12 +205,33 @@ export const getAllUsers = async (): Promise<UsersInterface[]> => {
     }
 };
 
+// --- ClassBooking API Functions ---
+export const getUserBookings = async (userId: number): Promise<any[]> => {
+    try {
+        const response = await api.get(`/class-bookings/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user bookings:', error);
+        throw error;
+    }
+};
+
 export const getUserById = async (id: number): Promise<UsersInterface> => {
     try {
         const response = await api.get(`/user/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching user by id:', error);
+        throw error;
+    }
+};
+
+export const cancelClassBooking = async (bookingId: number): Promise<any> => {
+    try {
+        const response = await api.delete(`/class-bookings/${bookingId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error cancelling class booking:', error);
         throw error;
     }
 };
@@ -280,6 +301,16 @@ export const deleteTrainer = async (id: number): Promise<void> => {
         await api.delete(`/trainers/${id}`);
     } catch (error) {
         console.error('Error deleting trainer:', error);
+        throw error;
+    }
+};
+
+export const createClassBooking = async (bookingData: { user_id: number; class_activity_id: number; status?: string }): Promise<any> => {
+    try {
+        const response = await api.post(`/class-bookings`, bookingData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating class booking:', error);
         throw error;
     }
 };

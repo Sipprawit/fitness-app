@@ -13,8 +13,8 @@ type TrainerSchedule struct {
     
     Status    string   `json:"status" gorm:"default:'Available'"`
 
-    TrainerID   uint      `json:"trainer_id"`     // FK ไปยัง Trainer
-    Trainer     Trainer   `gorm:"foreignKey:TrainerID" json:"trainer,omitempty"`
+    TrainerID   uint      `json:"TrainerID"`     // FK ไปยัง Trainer
+    Trainer     Trainer   `gorm:"foreignKey:TrainerID" json:"Trainer,omitempty"`
 
     Bookings []TrainBooking `gorm:"foreignKey:ScheduleID" json:"booking,omitempty"`
 

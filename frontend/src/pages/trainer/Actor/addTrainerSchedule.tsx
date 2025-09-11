@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CreateTrainerSchedule, GetTrainerById } from "../../../services/https";
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import dayjs, { Dayjs } from "dayjs";
@@ -27,25 +27,32 @@ function AddTrainerSchedule() {
 
   // ฟังก์ชันสำหรับดึงข้อมูลเทรนเนอร์และกำหนดค่าในฟอร์ม
   const onGetTrainerById = async (trainerId: number) => {
+    console.log("AddTrainerSchedule - Getting trainer data for ID:", trainerId);
     let res = await GetTrainerById(trainerId);
+    console.log("AddTrainerSchedule - GetTrainerById response:", res);
     if (res.status === 200) {
       setTrainer(res.data);
       form.setFieldsValue({
         trainer_id: res.data.first_name,
       });
+      console.log("AddTrainerSchedule - Trainer data set successfully");
     } else {
+      console.log("AddTrainerSchedule - Failed to get trainer data");
       messageApi.open({
         type: "error",
         content: "ไม่พบข้อมูลเทรนเนอร์",
       });
       setTimeout(() => {
-        navigate("/trainer/profile");
+        navigate("/trainer");
       }, 2000);
     }
   };
 
   // ฟังก์ชันสำหรับจัดการการส่งฟอร์ม
   const onFinish = async (values: any) => {
+    console.log("AddTrainerSchedule - Form values:", values);
+    console.log("AddTrainerSchedule - Trainer data:", trainer);
+    
     if (!values.available_date || !values.start_time || !values.end_time) {
       messageApi.open({
         type: "error",
@@ -66,10 +73,12 @@ function AddTrainerSchedule() {
       available_date: startDateTime.format(),
       start_time: startDateTime.format(),
       end_time: endDateTime.format(),
-      trainer_id: trainer?.ID as number,
+      TrainerID: trainer?.ID as number,
     };
 
+    console.log("AddTrainerSchedule - Formatted data:", formattedData);
     let res = await CreateTrainerSchedule(formattedData);
+    console.log("AddTrainerSchedule - API Response:", res);
 
     if (res.status === 201) {
       messageApi.open({
@@ -78,7 +87,7 @@ function AddTrainerSchedule() {
       });
       form.resetFields();
       setTimeout(() => {
-        navigate(`/trainer/${trainer?.ID}/schedule`);
+        navigate("/trainer");
       }, 1000);
     } else {
       messageApi.open({
@@ -95,20 +104,27 @@ function AddTrainerSchedule() {
 
   // ดึงข้อมูลเมื่อ component ถูก render ครั้งแรก
   useEffect(() => {
+    console.log("AddTrainerSchedule - Component mounted");
+    console.log("AddTrainerSchedule - ID from URL:", id);
     const trainerId = Number(id);
+    console.log("AddTrainerSchedule - Parsed trainerId:", trainerId);
     if (!isNaN(trainerId) && trainerId > 0) {
+      console.log("AddTrainerSchedule - Calling onGetTrainerById");
       onGetTrainerById(trainerId);
     } else {
+      console.log("AddTrainerSchedule - Invalid trainerId, redirecting to trainer");
       messageApi.open({
         type: "error",
         content: "ไม่พบ TrainerID ใน URL! กำลังกลับสู่หน้าหลัก...",
       });
       setTimeout(() => {
-        navigate("/trainer/profile");
+        navigate("/trainer");
       }, 2000);
     }
   }, [id]);
 
+  console.log("AddTrainerSchedule - Rendering component");
+  
   return (
     <div>
       {contextHolder}
@@ -180,11 +196,13 @@ function AddTrainerSchedule() {
             <Col style={{ marginTop: "40px" }}>
               <Form.Item>
                 <Space>
-                  <Link to={`/trainer/${id}/schedule`}>
-                    <Button htmlType="button" style={{ marginRight: "10px" }}>
-                      ยกเลิก
-                    </Button>
-                  </Link>
+                  <Button 
+                    htmlType="button" 
+                    style={{ marginRight: "10px" }}
+                    onClick={() => navigate("/trainer")}
+                  >
+                    ยกเลิก
+                  </Button>
                   <Button
                     type="primary"
                     htmlType="submit"

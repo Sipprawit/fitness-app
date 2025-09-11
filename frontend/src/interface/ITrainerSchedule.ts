@@ -1,4 +1,5 @@
 import type { TrainBookingInterface } from "./ITrainBooking";
+import type { TrainerInterface } from "./ITrainer";
 
 
 export interface ITrainerSchedule {
@@ -8,6 +9,7 @@ export interface ITrainerSchedule {
     start_time: string;
     end_time: string;
     TrainerID: number;
+    Trainer?: TrainerInterface;
     Status?: string;
     
     Booking?: TrainBookingInterface[];

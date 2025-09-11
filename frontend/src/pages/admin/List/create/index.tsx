@@ -37,6 +37,7 @@ function CustomerCreate() {
 
   // Submit form
   const onFinish = async (values: any) => {
+
     // แปลงค่า field ให้ตรง backend (ใช้ field names ที่ backend ต้องการ)
     const payload = {
       first_name: values.first_name,
@@ -46,6 +47,7 @@ function CustomerCreate() {
       birthday: values.birthday?.format("YYYY-MM-DD") || "",
       age: values.age,
       gender_id: values.gender_id,
+      actor: "admin", // กำหนดบทบาท
     };
 
     console.log("Payload being sent to API:", payload);

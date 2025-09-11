@@ -47,6 +47,7 @@ const ClassDetailPage: React.FC = () => {
     if (!classData) return <div>ไม่พบข้อมูลคลาส</div>;
 
     return (
+        <>
         <div className="main-content">
             <div className="content-section class-detail-card">
                 <div className="class-detail-header">
@@ -61,14 +62,15 @@ const ClassDetailPage: React.FC = () => {
                         <p><strong>เวลา:</strong> {classData.startTime} - {classData.endTime}</p>
                         <p><strong>สถานที่:</strong> {classData.location}</p>
                         <p><strong>สถานะ:</strong> {classData.currentParticipants}/{classData.capacity}</p>
-                        {/* แก้ไขส่วนของปุ่ม */}
+                        {/* ปุ่มสำหรับแอดมิน - แค่ย้อนกลับ */}
                         <div className="form-actions-bottom">
-                            <button onClick={handleGoBack} className="back-button">ย้อนกลับ</button>
+                            <button onClick={handleGoBack} className="back-button-gray">ย้อนกลับ</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
