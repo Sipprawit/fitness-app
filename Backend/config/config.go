@@ -49,6 +49,9 @@ func ConnectionDB() {
 func SetupDatabase() {
 	db.AutoMigrate(
 		&entity.Genders{},
+		&entity.ClassActivity{},
+		&entity.Equipment{},
+		&entity.Facility{},
 		&entity.Users{},   
 		&entity.Trainer{}, 
 		&entity.Admin{},   
@@ -58,6 +61,8 @@ func SetupDatabase() {
 		&entity.Meal{},
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
+		&entity.ClassBooking{},
+
 	)
 
 	// Seed genders (idempotent)
@@ -84,6 +89,42 @@ func SetupDatabase() {
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 	formattedBirthDay := BirthDay.Format("2006-01-02")
 
+
+	// Seed ClassActivity if empty
+	var existingClass entity.ClassActivity
+	if db.First(&existingClass).Error != nil {
+		classes := []entity.ClassActivity{
+			{Name: "Yoga Beginner", Description: "คลาสโยคะสำหรับผู้เริ่มต้น", Date: time.Now().Format("2006-01-02"), StartTime: "13:00", EndTime: "14:00", Location: "Yoga Room", Capacity: 20, ImageURL: ""},
+			{Name: "HIIT Training", Description: "คลาสคาร์ดิโอความเข้มข้นสูง", Date: time.Now().Format("2006-01-02"), StartTime: "15:00", EndTime: "15:45", Location: "Weight Zone", Capacity: 12, ImageURL: ""},
+		}
+		for _, c := range classes {
+			db.Create(&c)
+		}
+	}
+
+	// Seed Equipment if empty
+	var existingEquipment entity.Equipment
+	if db.First(&existingEquipment).Error != nil {
+		equipments := []entity.Equipment{
+			{Name: "ลู่วิ่ง A", Type: "คาร์ดิโอ", Zone: "โซนคาร์ดิโอ", Status: "Available", Condition: "Good", UsageHours: 120},
+			{Name: "ชุดดัมเบล", Type: "เวทเทรนนิ่ง", Zone: "โซนเวท", Status: "Available", Condition: "Good", UsageHours: 300},
+		}
+		for _, e := range equipments {
+			db.Create(&e)
+		}
+	}
+
+	// Seed Facility if empty
+	var existingFacility entity.Facility
+	if db.First(&existingFacility).Error != nil {
+		facilities := []entity.Facility{
+			{Name: "ห้องโยคะ", Zone: "A", Status: "Open", Capacity: 20},
+			{Name: "โซนเวท", Zone: "B", Status: "Open", Capacity: 30},
+		}
+		for _, f := range facilities {
+			db.Create(&f)
+		}
+	}
 	// --- สร้างข้อมูลเริ่มต้นใหม่ ---
 
 	// Admin

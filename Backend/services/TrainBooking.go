@@ -46,14 +46,14 @@ func CreateTrainBooking(booking entity.TrainBooking) (entity.TrainBooking, error
 	}
 
 	// preload relationships
-	db.Preload("Users").Preload("Schedule").First(&booking, booking.ID)
+	db.Preload("Users").Preload("Schedule").Preload("Schedule.Trainer").First(&booking, booking.ID)
 	return booking, nil
 }
 
 // GetTrainBookingByID ดึงข้อมูลการจองด้วย ID
 func GetTrainBookingByID(id uint) (entity.TrainBooking, error) {
 	var booking entity.TrainBooking
-	err := config.DB().Preload("Users").Preload("Schedule").First(&booking, id).Error
+	err := config.DB().Preload("Users").Preload("Schedule").Preload("Schedule.Trainer").First(&booking, id).Error
 	return booking, err
 }
 
@@ -64,6 +64,7 @@ func GetBookingsByUserID(userID uint) ([]entity.TrainBooking, error) {
 		Where("users_id = ?", userID).
 		Preload("Users").
 		Preload("Schedule").
+		Preload("Schedule.Trainer").
 		Find(&bookings).Error
 	return bookings, err
 }

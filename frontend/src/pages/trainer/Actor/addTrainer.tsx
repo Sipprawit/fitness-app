@@ -37,7 +37,7 @@ function TrainerCreate() {
         content: "ไม่พบข้อมูลเพศ",
       });
       setTimeout(() => {
-        navigate("/trainer");
+        navigate("/admin/List?view=trainers");
       }, 2000);
     }
   };
@@ -76,7 +76,7 @@ function TrainerCreate() {
         messageApi.success("เพิ่มข้อมูลเทรนเนอร์สำเร็จ");
         form.resetFields();
         setFileList([]); // Reset fileList state ด้วย
-        navigate("/trainer/profile");
+        navigate("/admin/List?view=trainers");
       } else {
         messageApi.error("ไม่สามารถสร้างข้อมูลเทรนเนอร์ได้");
       }
@@ -222,7 +222,7 @@ function TrainerCreate() {
             <Col style={{ marginTop: "40px" }}>
               <Form.Item>
                 <Space>
-                  <Link to="/trainer/profile">
+                  <Link to="/admin/List?view=trainers">
                     <Button htmlType="button" style={{ marginRight: "10px" }}>
                       ยกเลิก
                     </Button>
