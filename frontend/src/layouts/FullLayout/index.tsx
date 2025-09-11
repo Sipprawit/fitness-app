@@ -90,7 +90,7 @@ const FullLayout: React.FC = () => {
           onClick={() => setCurrentPage("manage-schedule")}
           style={{ color: "white" }}
         >
-          <Link to="/admin/schedule">
+          <Link to="/admin/classes">
             <ScheduleOutlined />
             <span>จัดการตารางคลาส</span>
           </Link>

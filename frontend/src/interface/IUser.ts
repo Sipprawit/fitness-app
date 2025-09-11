@@ -1,4 +1,5 @@
 export interface UsersInterface {
+  ID?: number;
   id?: number;
 
   first_name?: string;
@@ -11,9 +12,13 @@ export interface UsersInterface {
 
   age?: number;
 
+  birthDay?: string;
   birthday?: string;
 
   gender_id?: number;
+  gender?: {
+    gender: string;
+  };
 
   actor?: string;
 }

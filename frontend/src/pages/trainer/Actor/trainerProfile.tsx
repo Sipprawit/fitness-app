@@ -1,155 +1,140 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { GetTrainers, DeleteTrainerById } from "../../../services/https";
+import { useNavigate } from "react-router-dom";
+import { Button, Col, Row, Divider, Form, Input, Card, message, Select, Image } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import type { TrainerInterface } from "../../../interface/ITrainer";
-import { Space, Table, Button, Col, Row, Divider, message, Card } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
+import type { GenderInterface } from "../../../interface/Gender";
+import { GetGender, GetTrainerById } from "../../../services/https";
 
 function ProfileTrainer() {
   const navigate = useNavigate();
-  const [trainers, setTrainers] = useState<TrainerInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [gender, setGender] = useState<GenderInterface[]>([]);
+  const [form] = Form.useForm();
+  const [trainer, setTrainer] = useState<TrainerInterface | null>(null);
+  const baseURL = "http://localhost:8000";
 
-  const columns: ColumnsType<TrainerInterface> = [
-    {
-      title: "ลำดับ",
-      dataIndex: "ID",
-      key: "id",
-    },
-    {
-      title: "ชื่อ",
-      dataIndex: "first_name",
-      key: "first_name",
-    },
-    {
-      title: "นามสกุล",
-      dataIndex: "last_name",
-      key: "last_name",
-    },
-    {
-      title: "อีเมล",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "เบอร์โทรศัพท์",
-      dataIndex: "tel",
-      key: "tel",
-    },
-    {
-      title: "เพศ",
-      key: "gender",
-      render: (record) => <>{record?.gender?.gender}</>,
-    },
-    {
-      title: "ทักษะ",
-      dataIndex: "skill",
-      key: "skill",
-    },
-    {
-      title: "การจัดการ",
-      key: "action",
-      render: (record) => (
-        <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/trainer/edit/${record.ID}`)}
-          >
-            แก้ไข
-          </Button>
-          <Button
-            type="dashed"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => deleteTrainerById(record.ID)}
-          >
-            ลบ
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
-  const deleteTrainerById = async (id: number) => {
-    let res = await DeleteTrainerById(id);
-
+  const onGetGender = async () => {
+    let res = await GetGender();
     if (res.status === 200) {
-      messageApi.open({
-        type: "success",
-        content: "ลบข้อมูลเทรนเนอร์สำเร็จ",
-      });
-      await getTrainers();
-    } else {
-      messageApi.open({
-        type: "error",
-        content: res.data.error,
-      });
+      setGender(res.data);
     }
   };
 
-  const getTrainers = async () => {
-    let res = await GetTrainers();
-
+  const loadMe = async () => {
+    const idStr = localStorage.getItem("id");
+    const id = idStr ? Number(idStr) : NaN;
+    if (!id || Number.isNaN(id)) {
+      messageApi.error("ไม่พบรหัสผู้ใช้ที่กำลังล็อกอิน");
+      return;
+    }
+    const res = await GetTrainerById(id);
     if (res.status === 200) {
-      setTrainers(res.data);
-    } else {
-      setTrainers([]);
-      messageApi.open({
-        type: "error",
-        content: res.data.error,
+      const data = res.data as TrainerInterface & { gender?: GenderInterface };
+      setTrainer(data);
+      form.setFieldsValue({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        tel: data.tel,
+        skill: data.skill,
+        gender_id: (data as any)?.gender?.ID,
       });
+    } else {
+      messageApi.error(res.data?.error || "ไม่สามารถดึงข้อมูลเทรนเนอร์ได้");
     }
   };
 
   useEffect(() => {
-    getTrainers();
+    onGetGender();
+    loadMe();
   }, []);
+
+  const profileImageUrl = trainer?.profile_image
+    ? `${baseURL}${typeof trainer.profile_image === "string" ? trainer.profile_image : ""}`
+    : undefined;
 
   return (
     <>
       {contextHolder}
       <Card>
-        <Row align="middle">
-          <Col span={12}>
-            <h2>จัดการข้อมูลเทรนเนอร์</h2>
+        <Row align="middle" justify="space-between">
+          <Col>
+            <h2>โปรไฟล์เทรนเนอร์</h2>
           </Col>
-          <Col span={12} style={{ textAlign: "end" }}>
-            <Link to="/trainer/profile/addTrainer">
-              <Button type="primary" icon={<PlusOutlined />}>
-                เพิ่มข้อมูลเทรนเนอร์
+          {trainer?.ID && (
+            <Col>
+              <Button 
+                type="primary" 
+                icon={<EditOutlined />} 
+                onClick={() => navigate(`/trainer/edit/${trainer.ID}`)}
+                style={{ backgroundColor: '#e50000', borderColor: '#e50000' }}
+              >
+                แก้ไขโปรไฟล์
               </Button>
-            </Link>
-          </Col>
+            </Col>
+          )}
         </Row>
 
         <Divider />
 
-        <div style={{ marginTop: 20 }}>
-          <Table
-            rowKey="ID"
-            columns={columns}
-            dataSource={trainers}
-            style={{ width: "100%", overflowX: "auto" }}
-            onRow={(record) => {
-              return {
-                onClick: (event) => {
-                  // ป้องกันการกดซ้ำกับปุ่ม action
-                  const target = event.target as HTMLElement;
-                  if (
-                    target.closest("button") || // ถ้ากดปุ่ม (แก้ไข/ลบ)
-                    target.closest(".ant-btn") // กันกรณีปุ่ม antd อื่นๆ
-                  ) {
-                    return;
-                  }
-                  //ไปยังหน้าจัดตารางของเทรนเนอร์
-                  navigate(`/trainer/${record.ID}/schedule`);
-                },
-              };
-            }}
-          />
-        </div>
+        <Row gutter={[16, 0]}>
+          <Col xs={24} sm={24} md={8} lg={6}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+              <Image
+                src={profileImageUrl}
+                alt="profile"
+                width={260}
+                style={{ borderRadius: 12, objectFit: "cover" }}
+                fallback="https://via.placeholder.com/260x260?text=No+Image"
+                preview={!!profileImageUrl}
+              />
+            </div>
+          </Col>
+
+          <Col xs={24} sm={24} md={16} lg={18}>
+            <Form form={form} layout="vertical" disabled>
+              <Row gutter={[16, 0]}>
+                <Col xs={24} md={12}>
+                  <Form.Item label="ชื่อจริง" name="first_name">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="นามสกุล" name="last_name">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="อีเมล" name="email">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="เบอร์โทรศัพท์" name="tel">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="ทักษะ/ความเชี่ยวชาญ" name="skill">
+                    <Input.TextArea rows={4} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="เพศ" name="gender_id">
+                    <Select placeholder="เลือกเพศ">
+                      {gender?.map((g) => (
+                        <Select.Option key={g.ID} value={g.ID}>
+                          {g.gender}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Col>
+        </Row>
       </Card>
     </>
   );

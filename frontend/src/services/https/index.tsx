@@ -7,6 +7,7 @@ import type { NutritionData } from "../../interface/Nutrition";
 import type { TrainerInterface } from "../../interface/ITrainer";
 import type { ITrainerSchedule } from "../../interface/ITrainerSchedule";
 import type { TrainBookingInterface } from "../../interface/ITrainBooking";
+import type { IClassBooking } from "../../interface/IClassBooking";
 
 // ================= Config =================
 const apiUrl = "http://localhost:8000";
@@ -213,6 +214,43 @@ async function GetBookingsByUserId(userId: number) {
   }
 }
 
+// ================= Class Booking APIs =================
+async function BookClass(class_activity_id: number, user_id: number, status: string = "Confirmed") {
+  try {
+    return await axios.post< IClassBooking >(
+      `${apiUrl}/api/class-bookings`,
+      { class_activity_id, user_id, status },
+      authConfig()
+    );
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CancelClassBooking(bookingId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/class-bookings/${bookingId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetUserClassBooking(userId: number, classId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/class-bookings/user/${userId}/class/${classId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetUserBookings(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/class-bookings/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
 
 // ================= Nutrition APIs =================
 async function GetNutrition(date?: string) {
@@ -304,6 +342,12 @@ export {
   BookTrainerSchedule,
   CancelTrainBooking,
   GetBookingsByUserId,
+
+  // Class Booking
+  BookClass,
+  CancelClassBooking,
+  GetUserClassBooking,
+  GetUserBookings,
 
   // Nutrition
   GetNutrition,

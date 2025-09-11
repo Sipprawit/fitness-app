@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../components/Notification/NotificationProvider";
 
 interface UserProfile {
   id: number;
@@ -23,6 +24,7 @@ function ProfileCustomer() {
     email: ""
   });
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     fetchProfile();
@@ -79,13 +81,28 @@ function ProfileCustomer() {
         const updatedData = await response.json();
         setProfile(updatedData.data || updatedData);
         setIsEditing(false);
-        alert("บันทึกข้อมูลสำเร็จ!");
+        showNotification({
+          type: "success",
+          title: "สำเร็จ",
+          message: "บันทึกข้อมูลสำเร็จ!",
+          duration: 2000
+        });
       } else {
-        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+          duration: 3000
+        });
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+        duration: 3000
+      });
     } finally {
       setSaving(false);
     }
@@ -97,13 +114,23 @@ function ProfileCustomer() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+      showNotification({
+        type: "error",
+        title: "ไฟล์ไม่ถูกต้อง",
+        message: "กรุณาเลือกไฟล์รูปภาพเท่านั้น",
+        duration: 3000
+      });
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("ขนาดไฟล์ต้องไม่เกิน 5MB");
+      showNotification({
+        type: "error",
+        title: "ไฟล์ใหญ่เกินไป",
+        message: "ขนาดไฟล์ต้องไม่เกิน 5MB",
+        duration: 3000
+      });
       return;
     }
 
@@ -124,13 +151,28 @@ function ProfileCustomer() {
       if (response.ok) {
         const result = await response.json();
         setProfile(prev => prev ? { ...prev, avatar: result.avatar_url } : null);
-        alert("อัปโหลดรูปโปรไฟล์สำเร็จ!");
+        showNotification({
+          type: "success",
+          title: "สำเร็จ",
+          message: "อัปโหลดรูปโปรไฟล์สำเร็จ!",
+          duration: 2000
+        });
       } else {
-        alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "เกิดข้อผิดพลาดในการอัปโหลดรูป",
+          duration: 3000
+        });
       }
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "เกิดข้อผิดพลาดในการอัปโหลดรูป",
+        duration: 3000
+      });
     } finally {
       setUploading(false);
     }

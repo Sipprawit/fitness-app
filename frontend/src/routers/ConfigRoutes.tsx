@@ -9,8 +9,8 @@ import SignUpPage from "../pages/auth/Register";
 
 // Routes สำหรับลูกค้า (Customer)
 import Dashboard from "../pages/dashboard";
-import Booking from "../pages/classbooking/classHome";
-
+import Booking from "../pages/classbooking/ClassHome";
+import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
 import HealthHome from "../pages/health/Health/healthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
@@ -27,28 +27,36 @@ import CreateProgram from "../pages/trainer/Actor/personal-training/personalHome
 import TrainerProfile from "../pages/trainer/Actor/trainerProfile";
 import AddTrainer from "../pages/trainer/Actor/addTrainer";
 import EditTrainer from "../pages/trainer/Actor/editTrainer";
-import TrainerSchedule from "../pages/trainer/Actor/TrainerSchedule";
 import AddTrainerSchedule from "../pages/trainer/Actor/addTrainerSchedule";
 import TrainerDetail from "../pages/trainer/trainer/trainerDetail";
 import BookTrainSchedule from "../pages/trainer/trainer/BookTrainSchedule";
+import BookTrainHistory from "../pages/trainer/trainer/BookTrainHistory";
 
 // Routes สำหรับแอดมิน (Admin)
-import ManageSchedule from "../pages/admin/class-activity/class-activityHome";
-import ManageEquipment from "../pages/admin/equipment/equipmentHome";
+import ManageSchedule from "../pages/admin/ClassActivity/ClassActivityListPage";
+import ClassForm from "../pages/admin/ClassActivity/ClassActivityFormPage";
+import ClassDelete from "../pages/admin/ClassActivity/ClassActivityDeletePage";
+import ManageEquipment from "../pages/admin/EquipmentFacility/EquipmentFacilityPage";
+import EquipmentFacilityForm from "../pages/admin/EquipmentFacility/EquipmentFacilityFormPage";
+import EquipmentFacilityDelete from "../pages/admin/EquipmentFacility/EquipmentFacilityDeletePage";
 import UserList from "../pages/admin/List/userlist";
+import UserDeletePage from "../pages/admin/List/UserDeletePage";
+import TrainerDeletePage from "../pages/admin/List/TrainerDeletePage";
+import AdminClassDetailPage from "../pages/admin/ClassActivity/ClassDetailPage";
+import MemberClassDetailPage from "../pages/classbooking/ClassDetailPage";
 import { HealthActivityProvider } from "../contexts/HealthContext";
 import { NutritionProvider } from "../contexts/NutritionContext";
 
 
 
 const ConfigRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* หน้า login / signup ใช้งาน MinimalLayout */}
-      <Route element={<MinimalLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-      </Route>
+    return (
+        <Routes>
+            {/* หน้า login / signup ใช้งาน MinimalLayout */}
+            <Route element={<MinimalLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+            </Route>
 
       {/* หน้าที่ต้องป้องกัน (ต้อง Login) ใช้งาน FullLayout */}
       <Route
@@ -61,6 +69,8 @@ const ConfigRoutes: React.FC = () => {
         {/* --- Routes สำหรับลูกค้า (Customer) --- */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/booking" element={<Booking />} />
+        <Route path="/class" element={<Booking />} />
+        <Route path="/class/booking-history" element={<BookClass />} />
         <Route path="/trainerbooking" element={<TrainerBooking />} />
         <Route path="/health/Health" element={
           <HealthActivityProvider>
@@ -81,6 +91,7 @@ const ConfigRoutes: React.FC = () => {
         <Route path="/customer/edit/:id" element={<CustomerEdit />} />
         <Route path="/trainers/:id" element={<TrainerDetail />} />
         <Route path="/trainers/:id/train-bookings" element={<BookTrainSchedule />} />
+        <Route path="/trainer-booking-history" element={<BookTrainHistory />} />
 
         {/* --- Routes สำหรับเทรนเนอร์ (Trainer) --- */}
         <Route path="/trainer" element={<TrainerDashboard />} />
@@ -88,22 +99,40 @@ const ConfigRoutes: React.FC = () => {
         <Route path="/trainer/profile" element={<TrainerProfile />} />
         <Route path="/trainer/profile/addTrainer" element={<AddTrainer />} />
         <Route path="/trainer/edit/:id" element={<EditTrainer />} />
-        <Route path="/trainer/:id/schedule" element={<TrainerSchedule />} />
         <Route
           path="/trainer/:id/schedule/addTrainerSchedule"
           element={<AddTrainerSchedule />}
         />
 
         {/* --- Routes สำหรับแอดมิน (Admin) --- */}
-        <Route path="/admin/schedule" element={<ManageSchedule />} />
-        <Route path="/admin/equipment" element={<ManageEquipment />} />
-        <Route path="/admin/List" element={<UserList />} />
-      </Route>
+                <Route path="/admin/classes" element={<ManageSchedule />} />
+                <Route path="/admin/class/detail/:id" element={<AdminClassDetailPage />} />
+                
+                {/* --- เพิ่ม Route สำหรับหน้ารายละเอียดคลาส --- */}
+                <Route path="/class/detail/:id" element={<MemberClassDetailPage />} />
+                
+                <Route path="/class/add" element={<ClassForm />} />
+                <Route path="/class/edit/:id" element={<ClassForm />} />
+                <Route path="/class/delete/:id" element={<ClassDelete />} />
 
-      {/* Redirect ไปหน้า login ถ้าเข้า path ที่ไม่ถูกต้อง */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
-  );
+                <Route path="/admin/equipment" element={<ManageEquipment />} />
+                {/* Equipment CRUD */}
+                <Route path="/equipment/add" element={<EquipmentFacilityForm itemType="equipment" />} />
+                <Route path="/equipment/edit/:id" element={<EquipmentFacilityForm itemType="equipment" />} />
+                <Route path="/equipment/delete/:id" element={<EquipmentFacilityDelete itemType="equipment" />} />
+                {/* Facility CRUD */}
+                <Route path="/facility/add" element={<EquipmentFacilityForm itemType="facility" />} />
+                <Route path="/facility/edit/:id" element={<EquipmentFacilityForm itemType="facility" />} />
+                <Route path="/facility/delete/:id" element={<EquipmentFacilityDelete itemType="facility" />} />
+                <Route path="/admin/List" element={<UserList />} />
+                <Route path="/user/delete/:id" element={<UserDeletePage />} />
+                <Route path="/trainer/delete/:id" element={<TrainerDeletePage />} />
+            </Route>
+
+            {/* Redirect ไปหน้า login ถ้าเข้า path ที่ไม่ถูกต้อง */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+    );
 };
 
 export default ConfigRoutes;

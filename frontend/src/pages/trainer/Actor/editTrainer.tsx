@@ -23,12 +23,13 @@ import {
 } from "../../../services/https"; // ✅ เพิ่ม import UploadImage
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import type { GenderInterface } from "../../../interface/Gender";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function TrainerEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: any }>();
   const [messageApi, contextHolder] = message.useMessage();
+  const actor = localStorage.getItem("actor");
   const [gender, setGender] = useState<GenderInterface[]>([]);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -45,7 +46,11 @@ function TrainerEdit() {
         content: "ไม่พบข้อมูลเพศ",
       });
       setTimeout(() => {
-        navigate("/trainer");
+        if (actor === "admin") {
+          navigate("/admin/List?view=trainers");
+        } else {
+          navigate("/trainer/profile");
+        }
       }, 2000);
     }
   };
@@ -85,7 +90,11 @@ function TrainerEdit() {
         content: "ไม่พบข้อมูลเทรนเนอร์",
       });
       setTimeout(() => {
-        navigate("/trainer");
+        if (actor === "admin") {
+          navigate("/admin/List?view=trainers");
+        } else {
+          navigate("/trainer/profile");
+        }
       }, 2000);
     }
   };
@@ -119,7 +128,11 @@ function TrainerEdit() {
           content: "แก้ไขข้อมูลเทรนเนอร์สำเร็จ!",
         });
         setTimeout(() => {
-          navigate("/trainer/profile");
+          if (actor === "admin") {
+            navigate("/admin/List?view=trainers");
+          } else {
+            navigate("/trainer/profile");
+          }
         }, 2000);
       } else {
         messageApi.open({
@@ -264,11 +277,19 @@ function TrainerEdit() {
             <Col style={{ marginTop: "40px" }}>
               <Form.Item>
                 <Space>
-                  <Link to="/trainer/profile">
-                    <Button htmlType="button" style={{ marginRight: "10px" }}>
-                      ยกเลิก
-                    </Button>
-                  </Link>
+                  <Button 
+                    htmlType="button" 
+                    style={{ marginRight: "10px" }}
+                    onClick={() => {
+                      if (actor === "admin") {
+                        navigate("/admin/List?view=trainers");
+                      } else {
+                        navigate("/trainer/profile");
+                      }
+                    }}
+                  >
+                    ยกเลิก
+                  </Button>
                   <Button
                     type="primary"
                     htmlType="submit"

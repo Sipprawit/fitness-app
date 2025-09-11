@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Spin } from "antd";
+import { Card, Row, Col, Spin, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { GetTrainers } from "../../../services/https";
 import type { TrainerInterface } from "../../../interface/ITrainer";
@@ -36,9 +36,28 @@ const TrainerBooking: React.FC = () => {
         <h1 className="text-5xl font-extrabold mb-2">
           Trainer Booking
         </h1>
-        <p className="text-xl">
-          หน้านี้สำหรับจองเทรนเนอร์
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-xl">
+            สำหรับการจองเทรนเนอร์
+          </p>
+          <Button 
+            type="default"
+            onClick={() => navigate('/trainer-booking-history')}
+            style={{
+              backgroundColor: '#f5f5f5',
+              borderColor: '#d9d9d9',
+              color: '#595959',
+              borderRadius: '6px',
+              fontWeight: '400',
+              fontSize: '14px',
+              height: '32px',
+              padding: '4px 15px',
+              boxShadow: 'none'
+            }}
+          >
+            ดูประวัติการจอง
+          </Button>
+        </div>
       </div>
 
       {/* รายการ Trainer */}

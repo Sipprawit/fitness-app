@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Col, Divider, Row, Table, message, Statistic } from "antd";
+import { Card, Col, Divider, Row, Table, message, Statistic, Button, Popconfirm } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { GetTrainerSchedulesByTrainer } from "../../../services/https";
+import { GetTrainerSchedulesByTrainer, DeleteTrainerScheduleById } from "../../../services/https";
+import { useNavigate } from "react-router-dom";
 
 interface ScheduleInterface {
   ID: number;
@@ -21,6 +23,7 @@ interface ScheduleInterface {
 function HomeTrainer() {
   const [schedules, setSchedules] = useState<ScheduleInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
 
   const columns: ColumnsType<ScheduleInterface> = [
     {
@@ -72,6 +75,28 @@ function HomeTrainer() {
               .join(", ")
           : "ยังไม่มีการจอง",
     },
+    {
+      title: "การดำเนินการ",
+      key: "actions",
+      render: (_: any, record: ScheduleInterface) => (
+        <Popconfirm
+          title="ยืนยันการลบ"
+          description="คุณแน่ใจหรือไม่ที่จะลบตารางเวลานี้?"
+          onConfirm={() => handleDeleteSchedule(record.ID)}
+          okText="ยืนยัน"
+          cancelText="ยกเลิก"
+        >
+          <Button
+            type="primary"
+            danger
+            icon={<DeleteOutlined />}
+            size="small"
+          >
+            ลบ
+          </Button>
+        </Popconfirm>
+      ),
+    },
   ];
 
   const totalSchedules = schedules.length;
@@ -105,6 +130,20 @@ function HomeTrainer() {
     }
   };
 
+  const handleDeleteSchedule = async (scheduleId: number) => {
+    try {
+      const res = await DeleteTrainerScheduleById(scheduleId);
+      if (res.status === 200) {
+        messageApi.open({ type: "success", content: "ลบตารางเวลาสำเร็จ" });
+        fetchAllSchedules(); // รีเฟรชข้อมูล
+      } else {
+        messageApi.open({ type: "error", content: res.data?.error || "ไม่สามารถลบตารางเวลาได้" });
+      }
+    } catch (err: any) {
+      messageApi.open({ type: "error", content: err?.message || "เกิดข้อผิดพลาดในการลบตารางเวลา" });
+    }
+  };
+
   useEffect(() => {
     fetchAllSchedules();
   }, []);
@@ -133,7 +172,34 @@ function HomeTrainer() {
       <Divider />
 
       <Card>
-        <h2 className="text-xl font-bold" style={{ marginBottom: 16 }}>ตารางเวลาทั้งหมด</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 className="text-xl font-bold" style={{ margin: 0 }}>ตารางเวลาทั้งหมด</h2>
+          <Button 
+            icon={<PlusOutlined />}
+            onClick={() => {
+              const trainerId = localStorage.getItem("id");
+              console.log("TrainerHome - trainerId from localStorage:", trainerId);
+              if (trainerId) {
+                const url = `/trainer/${trainerId}/schedule/addTrainerSchedule`;
+                console.log("TrainerHome - Navigating to:", url);
+                navigate(url);
+              } else {
+                messageApi.open({ type: "error", content: "ไม่พบรหัสเทรนเนอร์ที่กำลังล็อกอิน" });
+              }
+            }}
+            style={{ backgroundColor: '#e50000', borderColor: '#e50000', color: 'white' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#cc0000';
+              e.currentTarget.style.borderColor = '#cc0000';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#e50000';
+              e.currentTarget.style.borderColor = '#e50000';
+            }}
+          >
+            สร้างตารางเวลา
+          </Button>
+        </div>
         <Table
           rowKey="ID"
           columns={columns}

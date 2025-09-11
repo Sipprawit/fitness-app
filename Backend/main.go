@@ -23,13 +23,10 @@ import (
 const PORT = "8000"
 
 func main() {
-
 	// open connection database
-
 	config.ConnectionDB()
 
 	// Generate databases
-
 	config.SetupDatabase()
 
 	r := gin.Default()
@@ -47,22 +44,20 @@ func main() {
 	// ให้บริการไฟล์อัปโหลดแบบสาธารณะ
 	r.Static("/uploads", "uploads")
 
-	// Auth Routes
+	// Public Routes (no authentication required)
 	r.POST("/signup", users.SignUp)
 	r.POST("/signin", users.SignIn)
-
-	// Public upload route for images
 	r.POST("/upload", uploads.Upload)
+	r.GET("/genders", genders.GetAll)
+	routes.PublicClassRoutes(r)
 
-	// API Group
+	// API Group (with authentication)
 	api := r.Group("/api")
 	{
 		api.Use(middlewares.Authorizes())
 
-		// User Profile Routes
+		// User Routes
 		routes.UserProfileRoutes(api)
-
-		// User Management Routes (Admin)
 		api.PUT("/user/:id", users.Update)
 		api.GET("/users", users.GetAll)
 		api.GET("/user/:id", users.Get)
@@ -73,20 +68,23 @@ func main() {
 
 		// Trainer-related Routes
 		routes.TrainerRoutes(api)
+
+		// Class Routes
+		routes.ClassRoutes(api)
+
+		// Equipment Routes
+		routes.EquipmentRoutes(api)
+
+		// Facility Routes
+		routes.FacilityRoutes(api)
 	}
 
-	r.GET("/genders", genders.GetAll)
-
 	r.GET("/", func(c *gin.Context) {
-
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
-
 	})
 
 	// Run the server
-
 	r.Run("localhost:" + PORT)
-
 }
 
 func CORSMiddleware() gin.HandlerFunc {
