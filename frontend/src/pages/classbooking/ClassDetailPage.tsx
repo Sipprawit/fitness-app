@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, message } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import type { ClassActivity } from '../../types';
 import { getClassById } from '../../services/apiService';
 import { BookClass, GetUserClassBooking, CancelClassBooking } from '../../services/https';
@@ -16,6 +17,16 @@ const ClassDetailPage: React.FC = () => {
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [userBooking, setUserBooking] = useState<any>(null);
     const [isBooked, setIsBooked] = useState<boolean>(false);
+
+    // ฟังก์ชันตรวจสอบว่าเลยเวลาไปแล้วหรือไม่
+    const isClassTimePassed = (classData: ClassActivity | null): boolean => {
+        if (!classData) return false;
+        
+        const classDateTime = dayjs(`${classData.date} ${classData.startTime}`, 'YYYY-MM-DD HH:mm');
+        const now = dayjs();
+        
+        return now.isAfter(classDateTime);
+    };
 
     useEffect(() => {
         const fetchClassData = async () => {
@@ -139,19 +150,49 @@ const ClassDetailPage: React.FC = () => {
                         <div className="form-actions-bottom">
                             <button onClick={handleGoBack} className="back-button-gray">ย้อนกลับ</button>
                             {isBooked ? (
-                                <button 
-                                    onClick={handleCancelBooking}
-                                    className="book-button"
-                                >
-                                    ยกเลิกการจอง
-                                </button>
+                                isClassTimePassed(classData) ? (
+                                    <button 
+                                        disabled
+                                        className="book-button"
+                                        style={{ 
+                                            backgroundColor: '#ccc', 
+                                            cursor: 'not-allowed',
+                                            opacity: 0.6 
+                                        }}
+                                        title="ไม่สามารถยกเลิกได้เนื่องจากเลยเวลาไปแล้ว"
+                                    >
+                                        ไม่สามารถยกเลิกได้
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={handleCancelBooking}
+                                        className="book-button"
+                                    >
+                                        ยกเลิกการจอง
+                                    </button>
+                                )
                             ) : (
-                                <button 
-                                    onClick={handleBookClass}
-                                    className="book-button"
-                                >
-                                    จองคลาส
-                                </button>
+                                isClassTimePassed(classData) ? (
+                                    <button 
+                                        disabled
+                                        className="book-button"
+                                        style={{ 
+                                            backgroundColor: '#ccc', 
+                                            cursor: 'not-allowed',
+                                            opacity: 0.6 
+                                        }}
+                                        title="ไม่สามารถจองได้เนื่องจากเลยเวลาไปแล้ว"
+                                    >
+                                        ไม่สามารถจองได้
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={handleBookClass}
+                                        className="book-button"
+                                    >
+                                        จองคลาส
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

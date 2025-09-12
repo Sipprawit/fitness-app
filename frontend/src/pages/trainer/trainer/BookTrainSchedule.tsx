@@ -333,20 +333,27 @@ const BookTrainSchedule: React.FC = () => {
 
                 if (slot.status === "Booked") {
                   if (slot.user_id === Number(localStorage.getItem("id"))) {
+                    const canCancel = !slot.isPast; // ตรวจสอบว่าไม่เลยเวลา
                     cellContent = (
                       <>
                         <span>จองแล้ว</span>
                         <br />
-                        <Button
-                          type="link"
-                          style={{ color: "red", padding: 0 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelBooking(slot.booking_id); // ✅ ใช้ booking_id
-                          }}
-                        >
-                          ยกเลิก
-                        </Button>
+                        {canCancel ? (
+                          <Button
+                            type="link"
+                            style={{ color: "red", padding: 0 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelBooking(slot.booking_id); // ✅ ใช้ booking_id
+                            }}
+                          >
+                            ยกเลิก
+                          </Button>
+                        ) : (
+                          <span style={{ color: "#999", fontSize: "12px" }}>
+                            ไม่สามารถยกเลิกได้
+                          </span>
+                        )}
                       </>
                     );
                   } else {

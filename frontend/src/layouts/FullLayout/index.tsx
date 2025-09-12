@@ -16,6 +16,7 @@ import {
   ScheduleOutlined,
   AppstoreOutlined,
   TeamOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/gymmy2.png";
 
@@ -177,6 +178,17 @@ const FullLayout: React.FC = () => {
             </Link>
           </Menu.Item>
         </Menu.SubMenu>
+
+        <Menu.Item
+          key="review"
+          onClick={() => setCurrentPage("review")}
+          style={{ color: "white" }}
+        >
+          <Link to="/review">
+            <StarOutlined />
+            <span>รีวิวและให้คะแนน</span>
+          </Link>
+        </Menu.Item>
 
         <Menu.Item
           key="group"

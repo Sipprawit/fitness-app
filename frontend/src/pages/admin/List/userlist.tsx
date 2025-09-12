@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import { GetUsers, GetTrainers } from "../../../services/https";
+import { GetUsers, GetTrainers, GetGender } from "../../../services/https";
 import type { UsersInterface } from "../../../interface/IUser";
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,12 +8,33 @@ import "./userlist.css";
 
 type ViewMode = 'members' | 'trainers';
 
+// ฟังก์ชันสำหรับจัดรูปแบบวันที่ให้แสดงเฉพาะวันที่
+const formatDateOnly = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    // ตรวจสอบว่าเป็นวันที่ที่ถูกต้องหรือไม่
+    if (isNaN(date.getTime())) return dateString;
+    
+    // แปลงเป็นรูปแบบ YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    return dateString;
+  }
+};
+
 function Customers() {
   const navigate = useNavigate();
   const location = useLocation();
   const [viewMode, setViewMode] = useState<ViewMode>('members');
   const [users, setUsers] = useState<UsersInterface[]>([]);
   const [trainers, setTrainers] = useState<TrainerInterface[]>([]);
+  const [genders, setGenders] = useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const myId = localStorage.getItem("id");
 
@@ -75,6 +96,24 @@ function Customers() {
     return '-';
   };
 
+  // ฟังก์ชันแปลง gender_id เป็นชื่อเพศ
+  const getGenderById = (genderId: number) => {
+    const gender = genders.find(g => g.ID === genderId);
+    return gender ? gender.gender : '-';
+  };
+
+  // ดึงข้อมูลเพศ
+  const getGenders = async () => {
+    try {
+      const res = await GetGender();
+      if (res.status === 200) {
+        setGenders(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching genders:", error);
+    }
+  };
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const view = queryParams.get('view');
@@ -88,6 +127,7 @@ function Customers() {
   useEffect(() => {
     getUsers();
     getTrainers();
+    getGenders();
   }, []);
 
   return (
@@ -139,7 +179,7 @@ function Customers() {
                         <td>{user.email || '-'}</td>
                         <td>{user.age || '-'}</td>
                         <td>{getGenderThai(user.gender)}</td>
-                        <td>{user.birthDay || user.birthday || '-'}</td>
+                        <td>{formatDateOnly(user.birthDay || user.birthday) || '-'}</td>
                         <td><span className={`actor ${user.actor?.toLowerCase() || 'member'}`}>{getActorThai(user.actor || 'member')}</span></td>
                         <td className="actions-cell">
                           <button onClick={() => navigate(`/customer/edit/${user.ID || user.id}`)} className="icon-button edit-button">✏️</button>
@@ -180,7 +220,7 @@ function Customers() {
                         <td>{trainer.email || '-'}</td>
                         <td>{trainer.skill || '-'}</td>
                         <td>{trainer.tel || '-'}</td>
-                        <td>{getGenderThai(trainer.gender_id)}</td>
+                        <td>{getGenderById(trainer.gender_id)}</td>
                         <td className="actions-cell">
                           <button onClick={() => navigate(`/trainer/edit/${trainer.ID}`)} className="icon-button edit-button">✏️</button>
                           <button onClick={() => handleDeleteTrainer(trainer.ID)} className="icon-button delete-button">🗑️</button>
