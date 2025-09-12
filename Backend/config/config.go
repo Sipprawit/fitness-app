@@ -52,9 +52,9 @@ func SetupDatabase() {
 		&entity.ClassActivity{},
 		&entity.Equipment{},
 		&entity.Facility{},
-		&entity.Users{},   
-		&entity.Trainer{}, 
-		&entity.Admin{},   
+		&entity.Users{},
+		&entity.Trainer{},
+		&entity.Admin{},
 		&entity.Health{},
 		&entity.Activity{},
 		&entity.Nutrition{},
@@ -62,7 +62,8 @@ func SetupDatabase() {
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
 		&entity.ClassBooking{},
-
+		&entity.Review{},
+		&entity.WorkoutGroup{},
 	)
 
 	// Seed genders (idempotent)
@@ -88,7 +89,6 @@ func SetupDatabase() {
 	hashedPassword, _ := HashPassword("123456")
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 	formattedBirthDay := BirthDay.Format("2006-01-02")
-
 
 	// Seed ClassActivity if empty
 	var existingClass entity.ClassActivity
@@ -146,5 +146,48 @@ func SetupDatabase() {
 	db.Where(entity.Users{Email: "customer@gmail.com"}).FirstOrInit(&customer)
 	if customer.ID == 0 {
 		db.Create(&entity.Users{FirstName: "Customer", LastName: "User", Email: "customer@gmail.com", Age: 25, Password: hashedPassword, BirthDay: formattedBirthDay, GenderID: 2})
+	}
+
+	// Seed Reviews if empty
+	var existingReview entity.Review
+	if db.First(&existingReview).Error != nil {
+		// ดึงข้อมูลคลาสและเทรนเนอร์ที่สร้างไว้
+		var classActivity entity.ClassActivity
+		var trainer entity.Trainer
+		var user entity.Users
+
+		db.First(&classActivity)
+		db.First(&trainer)
+		db.First(&user)
+
+		// สร้างรีวิวสำหรับคลาส
+		reviews := []entity.Review{
+			{
+				Rating:         5,
+				Comment:        "คลาสโยคะดีมาก ได้ผ่อนคลายและยืดหยุ่นร่างกาย",
+				UserID:         user.ID,
+				ReviewableID:   classActivity.ID,
+				ReviewableType: "classes",
+			},
+			{
+				Rating:         4,
+				Comment:        "เทรนเนอร์สอนดีมาก มีเทคนิคที่เข้าใจง่าย",
+				UserID:         user.ID,
+				ReviewableID:   trainer.ID,
+				ReviewableType: "trainers",
+			},
+		}
+
+		for _, review := range reviews {
+			db.Create(&review)
+		}
+	}
+
+	// Try to add created_at column for group_members join table (ignore error if exists)
+	// ตรวจสอบว่าคอลัมน์มีอยู่แล้วหรือไม่ก่อนเพิ่ม
+	var columnExists bool
+	db.Raw("SELECT COUNT(*) > 0 FROM pragma_table_info('group_members') WHERE name = 'created_at'").Scan(&columnExists)
+	if !columnExists {
+		_ = db.Exec("ALTER TABLE group_members ADD COLUMN created_at DATETIME").Error // ignore error
 	}
 }

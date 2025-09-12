@@ -1,10 +1,11 @@
 package services
 
 import (
-	"example.com/fitness-backend/entity"
-	"example.com/fitness-backend/config"
 	"fmt"
 	"strings"
+
+	"example.com/fitness-backend/config"
+	"example.com/fitness-backend/entity"
 )
 
 // CreateTrainer เพิ่มข้อมูลเทรนเนอร์
@@ -47,7 +48,7 @@ func CreateTrainer(trainer entity.Trainer) (entity.Trainer, error) {
 // GetTrainers ดึงข้อมูลเทรนเนอร์ทั้งหมด
 func GetTrainers() ([]entity.Trainer, error) {
 	var trainers []entity.Trainer
-	err := config.DB().Preload("Gender").Find(&trainers).Error
+	err := config.DB().Preload("Gender").Preload("Reviews.User").Find(&trainers).Error
 	if err != nil {
 		return trainers, err
 	}
@@ -61,7 +62,7 @@ func GetTrainers() ([]entity.Trainer, error) {
 // GetTrainerByID ดึงข้อมูลเทรนเนอร์ตาม ID
 func GetTrainerByID(id uint) (entity.Trainer, error) {
 	var trainer entity.Trainer
-	err := config.DB().Preload("Gender").First(&trainer, id).Error
+	err := config.DB().Preload("Gender").Preload("Reviews.User").First(&trainer, id).Error
 	if err != nil {
 		return trainer, err
 	}

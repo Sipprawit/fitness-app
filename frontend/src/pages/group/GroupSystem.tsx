@@ -1,0 +1,218 @@
+// src/components/GroupSystem.tsx
+
+import { useState, useMemo, useEffect } from 'react';
+import GroupList from './../group/GroupList';
+import CreateGroupForm from './../group/CreateGroupForm';
+import GroupDetails from './../group/GroupDetails';
+import { GetGroups, CreateGroup, JoinGroup, LeaveGroup } from '../../services/https';
+
+export interface GroupMember {
+  userId: number;
+  name: string;
+  joinedAt: string;
+}
+
+export interface WorkoutGroup {
+  id: number;
+  name: string;
+  goal: string;
+  members: GroupMember[];
+  maxMembers: number;
+  startDate: string;
+  status: 'เปิดรับสมัคร' | 'ปิดรับสมัคร';
+}
+
+const GroupSystem = () => {
+  const [groups, setGroups] = useState<WorkoutGroup[]>([]);
+  const [currentView, setCurrentView] = useState<'list' | 'create' | 'details'>('list');
+  const [selectedGroup, setSelectedGroup] = useState<WorkoutGroup | null>(null);
+  
+  // === จุดที่แก้ไข 1: เพิ่ม State สำหรับเก็บคำค้นหา ===
+  const [searchTerm, setSearchTerm] = useState('');
+  // === สิ้นสุดจุดที่แก้ไข 1 ===
+
+  // === เพิ่ม State สำหรับแสดงข้อความยืนยันการเข้าร่วมกลุ่ม ===
+  const [joinSuccessMessage, setJoinSuccessMessage] = useState<string>('');
+  // === สิ้นสุดการเพิ่ม State ===
+
+  const currentUserId = Number(localStorage.getItem('id') || 0);
+
+  const loadGroups = async (): Promise<WorkoutGroup[]> => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No auth token found.');
+      return [];
+    }
+    
+    try {
+      const res = await GetGroups();
+      if (res.status !== 200) {
+        console.error('API Error:', res.data);
+        setGroups([]);
+        return [];
+      }
+      
+      const raw = Array.isArray(res.data) ? res.data : [];
+      const normalized: WorkoutGroup[] = raw.map((g: any) => ({
+        id: g.ID ?? g.id,
+        name: g.name ?? g.Name,
+        goal: g.goal ?? g.Goal ?? '',
+        maxMembers: g.max_members ?? g.MaxMembers ?? 0,
+        startDate: (g.start_date ?? g.StartDate) ? new Date(g.start_date ?? g.StartDate).toISOString().split('T')[0] : '',
+        status: (g.status ?? g.Status ?? 'เปิดรับสมัคร') as WorkoutGroup['status'],
+        members: Array.isArray(g.members) ? g.members.map((m: any) => ({
+          userId: m.ID ?? m.id,
+          name: m.name ?? (m.FirstName ? `${m.FirstName} ${m.LastName ?? ''}` : ''),
+          joinedAt: m.joined_at ? new Date(m.joined_at).toISOString().split('T')[0] : '',
+        })) : [],
+      }));
+      setGroups(normalized);
+      return normalized;
+    } catch (e) {
+      console.error('Failed to load groups', e);
+      setGroups([]);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    loadGroups();
+    const onFocus = () => loadGroups();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
+  const handleCreateGroup = async (newGroupData: Omit<WorkoutGroup, 'id' | 'members'>) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('User not authenticated');
+      return;
+    }
+    
+    try {
+      const response = await CreateGroup({
+        name: newGroupData.name,
+        goal: newGroupData.goal,
+        maxMembers: newGroupData.maxMembers,
+        status: newGroupData.status,
+        startDate: newGroupData.startDate, // YYYY-MM-DD
+      });
+      
+      if (response.status === 200 || response.status === 201) {
+        await loadGroups();
+        setCurrentView('list');
+      } else {
+        const msg = response.data?.error || 'สร้างกลุ่มไม่สำเร็จ';
+        alert(msg);
+      }
+    } catch (e) {
+      console.error('Failed to create group', e);
+      const msg = (e as any)?.response?.data?.error || 'สร้างกลุ่มไม่สำเร็จ';
+      alert(msg);
+    }
+  };
+
+  const handleViewGroup = (group: WorkoutGroup) => {
+    setSelectedGroup(group);
+    setCurrentView('details');
+  };
+
+  const handleJoinGroup = async (groupId: number) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('User not authenticated');
+      return;
+    }
+    
+    try {
+      const response = await JoinGroup(groupId);
+      
+      if (response.status === 200 || response.status === 201) {
+        // แสดงข้อความยืนยันการเข้าร่วมกลุ่ม
+        setJoinSuccessMessage('เข้าร่วมกลุ่มสำเร็จแล้ว!');
+        
+        // รีโหลดรายการกลุ่ม แล้วเปิดหน้ารายละเอียดของกลุ่มที่เพิ่งเข้าร่วม
+        const updatedGroups = await loadGroups();
+        const justJoined = updatedGroups.find(g => g.id === groupId);
+        if (justJoined) {
+          setSelectedGroup(justJoined);
+          setCurrentView('details');
+        }
+        
+        // ลบข้อความยืนยันหลังจาก 3 วินาที
+        setTimeout(() => {
+          setJoinSuccessMessage('');
+        }, 3000);
+      } else {
+        const msg = response.data?.error || 'เข้าร่วมกลุ่มไม่สำเร็จ';
+        alert(msg);
+      }
+    } catch (e) {
+      console.error('Failed to join group', e);
+      const msg = (e as any)?.response?.data?.error || 'เข้าร่วมกลุ่มไม่สำเร็จ';
+      alert(msg);
+    }
+  };
+
+  const handleLeaveGroup = async (groupId: number) => {
+    try {
+      const response = await LeaveGroup(groupId);
+      
+      if (response.status === 200 || response.status === 201) {
+        await loadGroups();
+        setCurrentView('list');
+      } else {
+        const msg = response.data?.error || 'ออกจากกลุ่มไม่สำเร็จ';
+        alert(msg);
+      }
+    } catch (e) {
+      console.error('Failed to leave group', e);
+      alert('ออกจากกลุ่มไม่สำเร็จ');
+    }
+  };
+
+  // === จุดที่แก้ไข 2: สร้างรายการกลุ่มที่กรองตามคำค้นหา ===
+  const filteredGroups = useMemo(() => {
+    if (!searchTerm) {
+      return groups; // ถ้าไม่มีคำค้นหา ให้แสดงทั้งหมด
+    }
+    return groups.filter(group =>
+      group.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [groups, searchTerm]); // จะคำนวณใหม่เมื่อ groups หรือ searchTerm เปลี่ยน
+  // === สิ้นสุดจุดที่แก้ไข 2 ===
+
+  switch (currentView) {
+    case 'create':
+      return <CreateGroupForm onSubmit={handleCreateGroup} onBack={() => setCurrentView('list')} />;
+    case 'details':
+      return <GroupDetails group={selectedGroup!} onBack={() => setCurrentView('list')} onLeave={() => handleLeaveGroup(selectedGroup!.id)} currentUserId={currentUserId} joinSuccessMessage={joinSuccessMessage} />;
+    case 'list':
+    default:
+      // === จุดที่แก้ไข 3: เพิ่มช่องค้นหาและส่ง `filteredGroups` ไปแสดงผล ===
+      return (
+        <div className="group-list-view">
+          <div className="filter-bar">
+            <input
+              type="text"
+              placeholder="ค้นหากลุ่ม..."
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {/* คุณอาจจะเพิ่มปุ่มค้นหาตรงนี้ถ้าต้องการ */}
+          </div>
+          <GroupList
+            groups={filteredGroups} // <--- ส่งกลุ่มที่กรองแล้วไปแสดง
+            onCreate={() => setCurrentView('create')}
+            onView={handleViewGroup}
+            onJoin={handleJoinGroup}
+            currentUserId={currentUserId}
+          />
+        </div>
+      );
+      // === สิ้นสุดจุดที่แก้ไข 3 ===
+  }
+};
+
+export default GroupSystem;

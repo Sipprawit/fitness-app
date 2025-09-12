@@ -77,6 +77,10 @@ func main() {
 
 		// Facility Routes
 		routes.FacilityRoutes(api)
+
+		routes.GroupRoutes(api)
+
+		routes.ReviewRoutes(api)
 	}
 
 	r.GET("/", func(c *gin.Context) {

@@ -279,6 +279,97 @@ export async function getNutrition(date?: string) {
   }
 }
 
+// ================= Class Activities APIs =================
+async function GetAllClasses() {
+  try {
+    return await axios.get(`${apiUrl}/api/classes`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetClassById(id: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/classes/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetClassReviews(classId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/classes/${classId}/reviews`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Group APIs =================
+async function GetGroups() {
+  try {
+    return await axios.get(`${apiUrl}/api/groups`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateGroup(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/groups`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function JoinGroup(groupId: number) {
+  try {
+    return await axios.post(`${apiUrl}/api/group/${groupId}/join`, {}, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function LeaveGroup(groupId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/group/${groupId}/leave`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteGroup(groupId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/group/${groupId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Review APIs =================
+async function CreateReview(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/reviews`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateReview(reviewId: number, data: any) {
+  try {
+    return await axios.put(`${apiUrl}/api/reviews/${reviewId}`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteReview(reviewId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/reviews/${reviewId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
 export async function upsertNutrition(payload: NutritionData) {
   try {
     return await axios.post(`${apiUrl}/api/nutrition`, payload, authConfig());
@@ -348,6 +439,23 @@ export {
   CancelClassBooking,
   GetUserClassBooking,
   GetUserBookings,
+
+  // Class Activities
+  GetAllClasses,
+  GetClassById,
+  GetClassReviews,
+
+  // Groups
+  GetGroups,
+  CreateGroup,
+  JoinGroup,
+  LeaveGroup,
+  DeleteGroup,
+
+  // Reviews
+  CreateReview,
+  UpdateReview,
+  DeleteReview,
 
   // Nutrition
   GetNutrition,

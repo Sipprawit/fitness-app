@@ -14,7 +14,7 @@ import (
 func GetAll(c *gin.Context) {
 	var items []entity.ClassActivity
 	db := config.DB()
-	result := db.Find(&items)
+	result := db.Preload("Reviews.User").Find(&items)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -34,7 +34,7 @@ func Get(c *gin.Context) {
 	id := c.Param("id")
 	var item entity.ClassActivity
 	db := config.DB()
-	result := db.First(&item, id)
+	result := db.Preload("Reviews.User").First(&item, id)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
@@ -135,4 +135,23 @@ func UploadImage(c *gin.Context) {
 
 	imageUrl := fmt.Sprintf("/uploads/class/%s", fileName)
 	c.JSON(http.StatusOK, gin.H{"imageUrl": imageUrl})
+}
+
+// GetClassReviews: ดึงรีวิวของคลาส
+func GetClassReviews(c *gin.Context) {
+	classID := c.Param("id")
+	var reviews []entity.Review
+	db := config.DB()
+
+	// ดึงรีวิวที่เกี่ยวข้องกับคลาสนี้
+	result := db.Where("reviewable_id = ? AND reviewable_type = ?", classID, "classes").
+		Preload("User").
+		Find(&reviews)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, reviews)
 }
