@@ -53,19 +53,43 @@ const GroupSystem = () => {
       }
       
       const raw = Array.isArray(res.data) ? res.data : [];
-      const normalized: WorkoutGroup[] = raw.map((g: any) => ({
+      console.log('Raw groups data from API:', raw);
+      const normalized: WorkoutGroup[] = raw.map((g: any) => {
+        console.log('Processing group:', g.name, 'Members:', g.members);
+        return {
         id: g.ID ?? g.id,
         name: g.name ?? g.Name,
         goal: g.goal ?? g.Goal ?? '',
         maxMembers: g.max_members ?? g.MaxMembers ?? 0,
         startDate: (g.start_date ?? g.StartDate) ? new Date(g.start_date ?? g.StartDate).toISOString().split('T')[0] : '',
         status: (g.status ?? g.Status ?? 'เปิดรับสมัคร') as WorkoutGroup['status'],
-        members: Array.isArray(g.members) ? g.members.map((m: any) => ({
-          userId: m.ID ?? m.id,
-          name: m.name ?? (m.FirstName ? `${m.FirstName} ${m.LastName ?? ''}` : ''),
-          joinedAt: m.joined_at ? new Date(m.joined_at).toISOString().split('T')[0] : '',
-        })) : [],
-      }));
+        members: Array.isArray(g.members) ? g.members.map((m: any) => {
+          console.log('Processing member:', m, 'joined_at:', m.joined_at, 'created_at:', m.created_at);
+          // ลองใช้ created_at หาก joined_at ไม่มี
+          const joinedDate = m.joined_at || m.created_at || m.CreatedAt;
+          console.log('Final joined date:', joinedDate);
+          
+          // หากไม่มีข้อมูลวันที่ ให้ใช้วันที่ปัจจุบันเป็น fallback
+          const displayDate = joinedDate ? 
+            new Date(joinedDate).toLocaleDateString('th-TH', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            }) : 
+            new Date().toLocaleDateString('th-TH', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            });
+            
+          return {
+            userId: m.ID ?? m.id,
+            name: m.name ?? (m.FirstName ? `${m.FirstName} ${m.LastName ?? ''}` : ''),
+            joinedAt: displayDate,
+          };
+        }) : [],
+        };
+      });
       setGroups(normalized);
       return normalized;
     } catch (e) {

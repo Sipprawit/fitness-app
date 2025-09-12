@@ -11,10 +11,10 @@ import SignUpPage from "../pages/auth/Register";
 import Booking from "../pages/classbooking/ClassHome";
 import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
-import HealthHome from "../pages/health/Health/HealthHome";
+import HealthHome from "../pages/health/Health/healthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
-import GroupSystem from "../pages/group/GroupSystem";
-import ReviewSystem from "../pages/review/ReviewSystem";
+
+import Group from "../pages/group/groupHome";
 import Package from "../pages/package/packageHome";
 import Customer from "../pages/customer";
 import CustomerCreate from "../pages/admin/List/create";
@@ -83,8 +83,7 @@ const ConfigRoutes: React.FC = () => {
             </NutritionProvider>
           </HealthActivityProvider>
         } />
-        <Route path="/review" element={<ReviewSystem />} />
-        <Route path="/group" element={<GroupSystem />} />
+        <Route path="/group" element={<Group />} />
         <Route path="/packages" element={<Package />} />
         <Route path="/customer" element={<Customer />} />
         <Route path="/customer/create" element={<CustomerCreate />} />

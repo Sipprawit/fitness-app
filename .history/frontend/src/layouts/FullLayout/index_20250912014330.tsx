@@ -16,7 +16,6 @@ import {
   ScheduleOutlined,
   AppstoreOutlined,
   TeamOutlined,
-  StarOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/gymmy2.png";
 
@@ -169,17 +168,6 @@ const FullLayout: React.FC = () => {
         </Menu.SubMenu>
 
         <Menu.Item
-          key="review"
-          onClick={() => setCurrentPage("review")}
-          style={{ color: "white" }}
-        >
-          <Link to="/review">
-            <StarOutlined />
-            <span>รีวิวและให้คะแนน</span>
-          </Link>
-        </Menu.Item>
-
-        <Menu.Item
           key="group"
           onClick={() => setCurrentPage("group")}
           style={{ color: "white" }}
@@ -255,7 +243,7 @@ const FullLayout: React.FC = () => {
 
             <Menu
               style={{ backgroundColor: "#C50000" }}
-              defaultSelectedKeys={[page ? page : "booking"]}
+              defaultSelectedKeys={[page ? page : "dashboard"]}
               mode="inline"
             >
               {menuItems}

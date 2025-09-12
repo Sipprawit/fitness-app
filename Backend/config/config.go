@@ -165,7 +165,6 @@ func SetupDatabase() {
 			Service: "บริการสระว่ายน้ำ",
 			Detail:  "ใช้บริการสระว่ายน้ำฟรี",
 		},
-		
 	}
 
 	// Create services if they don't exist
@@ -220,7 +219,6 @@ func SetupDatabase() {
 			ServiceID:   3,
 			Price:       12000,
 		},
-	
 	}
 
 	// Create packages if they don't exist
