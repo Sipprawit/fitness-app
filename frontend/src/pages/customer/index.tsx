@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../../components/Notification/NotificationProvider";
+import { CUSTOMER_THEME, PAGE_STYLES, CARD_STYLES, BUTTON_STYLES } from "../../constants/theme";
 
 interface UserProfile {
   id: number;
@@ -241,8 +242,13 @@ function ProfileCustomer() {
 
   if (loading) {
     return (
-      <div style={loadingStyle}>
-        <div style={spinnerStyle}>⏳</div>
+      <div style={{ 
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        fontSize: '1.2rem',
+      }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
         <p>กำลังโหลดข้อมูล...</p>
       </div>
     );
@@ -250,9 +256,14 @@ function ProfileCustomer() {
 
   if (!profile) {
     return (
-      <div style={errorStyle}>
-        <h2>ไม่พบข้อมูลโปรไฟล์</h2>
-        <button onClick={() => navigate("/login")} style={buttonStyle}>
+      <div style={{ 
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        textAlign: 'center',
+      }}>
+        <h2 style={{ color: CUSTOMER_THEME.primary }}>ไม่พบข้อมูลโปรไฟล์</h2>
+        <button onClick={() => navigate("/login")} style={BUTTON_STYLES.primary}>
           กลับไปหน้าเข้าสู่ระบบ
         </button>
       </div>
@@ -260,15 +271,15 @@ function ProfileCustomer() {
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={PAGE_STYLES.container}>
       {/* Header */}
-      <div style={headerStyle}>
-        <h1 style={titleStyle}> โปรไฟล์ส่วนตัว</h1>
-        <p style={subtitleStyle}>จัดการข้อมูลส่วนตัว</p>
+      <div style={PAGE_STYLES.header}>
+        <h1 style={PAGE_STYLES.title}>โปรไฟล์ส่วนตัว</h1>
+        <p style={PAGE_STYLES.subtitle}>จัดการข้อมูลส่วนตัว</p>
       </div>
 
       {/* Profile Card */}
-      <div style={profileCardStyle}>
+      <div style={CARD_STYLES.default}>
         {/* Avatar Section */}
         <div style={avatarSectionStyle}>
           <div style={avatarContainerStyle}>
@@ -345,15 +356,19 @@ function ProfileCustomer() {
                   onClick={handleSave} 
                   disabled={saving}
                   style={{
-                    ...saveButtonStyle,
-                    opacity: saving ? 0.7 : 1
+                    ...BUTTON_STYLES.primary,
+                    opacity: saving ? 0.7 : 1,
+                    flex: 1
                   }}
                 >
                   {saving ? "⏳ บันทึก..." : "💾 บันทึกข้อมูล"}
                 </button>
                 <button 
                   onClick={() => setIsEditing(false)}
-                  style={cancelButtonStyle}
+                  style={{
+                    ...BUTTON_STYLES.secondary,
+                    flex: 1
+                  }}
                 >
                   ❌ ยกเลิกการแก้ไข
                 </button>
@@ -365,8 +380,9 @@ function ProfileCustomer() {
                     onClick={handleAvatarDelete}
                     disabled={uploading}
                     style={{
-                      ...deleteAvatarButtonStyle,
-                      opacity: uploading ? 0.7 : 1
+                      ...BUTTON_STYLES.danger,
+                      opacity: uploading ? 0.7 : 1,
+                      width: '100%'
                     }}
                   >
                     {uploading ? "⏳ กำลังลบ..." : "🗑️ ลบรูปโปรไฟล์"}
@@ -390,7 +406,7 @@ function ProfileCustomer() {
 
               <button 
                 onClick={() => setIsEditing(true)}
-                style={editButtonStyle}
+                style={BUTTON_STYLES.primary}
               >
                 💪 แก้ไขข้อมูลนักกีฬา
               </button>

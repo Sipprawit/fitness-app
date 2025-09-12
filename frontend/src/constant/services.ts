@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
+
+import { message } from 'antd';
+
 // import { message } from 'antd'; // เปลี่ยนไปใช้ Notification component แทน
 import { GetServices, GetPackages } from '../services/https';
-import type { Package, Service } from '../interface/package';
+import type { Package, Service } from '../interface/Package';
+
 
 
 export const usePackageData = () => {
@@ -43,7 +47,9 @@ export const usePackageData = () => {
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('เกิดข้อผิดพลาดในการดึงข้อมูล');
+        message.error('เกิดข้อผิดพลาดในการดึงข้อมูล');
         // message.error('เกิดข้อผิดพลาดในการดึงข้อมูล'); // เปลี่ยนไปใช้ Notification component แทน
+
       } finally {
         setLoading(false);
       }

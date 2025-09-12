@@ -62,11 +62,16 @@ func SetupDatabase() {
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
 		&entity.ClassBooking{},
+
+
+		&entity.PersonalTrain{},
+
 		&entity.Review{},
 		&entity.WorkoutGroup{},
 		&entity.Package{},
 		&entity.Services{},
 		&entity.PackageMember{},
+
 	)
 
 	// Seed genders (idempotent)
@@ -229,6 +234,8 @@ func SetupDatabase() {
 		}
 	}
 
+
+
 	// Seed Reviews if empty
 	var existingReview entity.Review
 	if err := db.First(&existingReview).Error; err != nil && err == gorm.ErrRecordNotFound {
@@ -271,4 +278,5 @@ func SetupDatabase() {
 	if !columnExists {
 		_ = db.Exec("ALTER TABLE group_members ADD COLUMN created_at DATETIME").Error // ignore error
 	}
+
 }

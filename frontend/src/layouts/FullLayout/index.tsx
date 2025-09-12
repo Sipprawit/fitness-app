@@ -150,6 +150,17 @@ const FullLayout: React.FC = () => {
           </Link>
         </Menu.Item>
 
+        <Menu.Item
+          key="trainingprograms"
+          onClick={() => setCurrentPage("trainingprograms")}
+          style={{ color: "white" }}
+        >
+          <Link to="/training-programs">
+            <AimOutlined />
+            <span>โปรแกรมฝึก</span>
+          </Link>
+        </Menu.Item>
+
         <Menu.SubMenu
           key="health"
           title={

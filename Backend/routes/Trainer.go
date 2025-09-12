@@ -1,55 +1,68 @@
 package routes
 
 import (
-    trainerController "example.com/fitness-backend/controllers/Trainer"
-    trainerScheduleController "example.com/fitness-backend/controllers/TrainerSchedule"
-    trainBookingController "example.com/fitness-backend/controllers/TrainBooking"
-    "example.com/fitness-backend/middlewares"
-    "github.com/gin-gonic/gin"
+	personalTrainController "example.com/fitness-backend/controllers/PersonalTrain"
+	trainBookingController "example.com/fitness-backend/controllers/TrainBooking"
+	trainerController "example.com/fitness-backend/controllers/Trainer"
+	trainerScheduleController "example.com/fitness-backend/controllers/TrainerSchedule"
+	"example.com/fitness-backend/middlewares"
+	"github.com/gin-gonic/gin"
 )
 
 // TrainerRoutes registers trainer-related endpoints.
 // It mirrors the grouping and auth behavior used in HealthRoutes.
 func TrainerRoutes(r *gin.RouterGroup) {
-    // /trainers
-    trainers := r.Group("/trainers")
-    trainers.Use(middlewares.Authorizes())
-    {
-        trainers.POST("", trainerController.CreateTrainer)
-        trainers.GET("", trainerController.GetTrainers)
-        trainers.GET("/:id", trainerController.GetTrainerByID)
-        trainers.PUT("/:id", trainerController.UpdateTrainer)
-        trainers.DELETE("/:id", trainerController.DeleteTrainer)
-        trainers.POST("/:id/upload", trainerController.UploadFile)
-    }
+	// /trainers
+	trainers := r.Group("/trainers")
+	trainers.Use(middlewares.Authorizes())
+	{
+		trainers.POST("", trainerController.CreateTrainer)
+		trainers.GET("", trainerController.GetTrainers)
+		trainers.GET("/:id", trainerController.GetTrainerByID)
+		trainers.PUT("/:id", trainerController.UpdateTrainer)
+		trainers.DELETE("/:id", trainerController.DeleteTrainer)
+		trainers.POST("/:id/upload", trainerController.UploadFile)
+	}
 
-    // /trainer-schedules
-    schedules := r.Group("/trainer-schedules")
-    schedules.Use(middlewares.Authorizes())
-    {
-        schedules.POST("", trainerScheduleController.CreateTrainerSchedule)
-        schedules.GET("", trainerScheduleController.GetTrainerSchedules)
-        schedules.GET("/:id", trainerScheduleController.GetTrainerScheduleByID)
-        schedules.GET("/allschedules/:trainerID", trainerScheduleController.GetTrainerSchedulesByTrainerID)
-        schedules.PUT("/:id", trainerScheduleController.UpdateTrainerSchedule)
-        schedules.DELETE("/:id", trainerScheduleController.DeleteTrainerSchedule)
-    }
+	// /trainer-schedules
+	schedules := r.Group("/trainer-schedules")
+	schedules.Use(middlewares.Authorizes())
+	{
+		schedules.POST("", trainerScheduleController.CreateTrainerSchedule)
+		schedules.GET("", trainerScheduleController.GetTrainerSchedules)
+		schedules.GET("/:id", trainerScheduleController.GetTrainerScheduleByID)
+		schedules.GET("/allschedules/:trainerID", trainerScheduleController.GetTrainerSchedulesByTrainerID)
+		schedules.PUT("/:id", trainerScheduleController.UpdateTrainerSchedule)
+		schedules.DELETE("/:id", trainerScheduleController.DeleteTrainerSchedule)
+	}
 
-    // /trainers/schedules/:trainerId
-    trainerSchedules := r.Group("/trainers")
-    trainerSchedules.Use(middlewares.Authorizes())
-    {
-        trainerSchedules.GET("/schedules/:trainerId", trainerScheduleController.GetTrainerSchedulesByDate)
-    }
+	// /trainers/schedules/:trainerId
+	trainerSchedules := r.Group("/trainers")
+	trainerSchedules.Use(middlewares.Authorizes())
+	{
+		trainerSchedules.GET("/schedules/:trainerId", trainerScheduleController.GetTrainerSchedulesByDate)
+	}
 
-    // /train-bookings
-    bookings := r.Group("/train-bookings")
-    bookings.Use(middlewares.Authorizes())
-    {
-        bookings.POST("", trainBookingController.CreateTrainBooking)
-        bookings.GET("/user/:userID", trainBookingController.GetUserBookings)
-        bookings.DELETE("/:id", trainBookingController.CancelTrainBooking)
-    }
+	// /train-bookings
+	bookings := r.Group("/train-bookings")
+	bookings.Use(middlewares.Authorizes())
+	{
+		bookings.POST("", trainBookingController.CreateTrainBooking)
+		bookings.GET("/user/:userID", trainBookingController.GetUserBookings)
+		bookings.DELETE("/:id", trainBookingController.CancelTrainBooking)
+		bookings.GET("/customers", trainBookingController.GetCustomersByTrainerID)
+		bookings.GET("/customer/:customerID/times", trainBookingController.GetCustomerBookedTimes)
+	}
+
+	// /personal-training
+	personalTraining := r.Group("/personal-training")
+	personalTraining.Use(middlewares.Authorizes())
+	{
+		personalTraining.GET("/customer/:customerID", personalTrainController.GetPersonalTrainingProgramsByCustomerID)
+		personalTraining.GET("/trainer", personalTrainController.GetPersonalTrainingProgramsByTrainerID)
+		personalTraining.POST("", personalTrainController.CreatePersonalTrainingProgram)
+		personalTraining.GET("/:id", personalTrainController.GetPersonalTrainingProgramByID)
+		personalTraining.PUT("/:id", personalTrainController.UpdatePersonalTrainingProgram)
+		personalTraining.DELETE("/:id", personalTrainController.DeletePersonalTrainingProgram)
+	}
 }
-
-

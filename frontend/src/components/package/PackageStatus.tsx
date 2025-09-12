@@ -1,20 +1,29 @@
 import React from 'react';
 
+import { Button } from 'antd';
+
+
 interface PackageStatusProps {
   hasPackage: boolean;
   packageName?: string;
   packageType?: string;
+
+  onCancelPackage: () => void;
+
 }
 
 export const PackageStatus: React.FC<PackageStatusProps> = ({
   hasPackage,
   packageName,
-  packageType
+  packageType,
+  onCancelPackage
 }) => {
   return (
     <div style={{ 
       display: 'flex', 
+
       alignItems: 'flex-end'
+
     }}>
       <div style={{ 
         padding: '8px 16px', 
@@ -33,6 +42,26 @@ export const PackageStatus: React.FC<PackageStatusProps> = ({
           : 'ยังไม่ทำการสมัครแพ็คเกจสมาชิก'
         }
       </div>
+      {hasPackage && (
+        <Button
+          type="primary"
+          danger
+          size="small"
+          style={{
+            backgroundColor: '#ff4d4f',
+            borderColor: '#ff4d4f',
+            borderRadius: '16px',
+            fontWeight: '500',
+            fontSize: '12px',
+            height: '32px',
+            padding: '0 16px'
+          }}
+          onClick={onCancelPackage}
+        >
+          ยกเลิกการสมัครแพ็คเกจ
+        </Button>
+      )}
+
     </div>
   );
 };

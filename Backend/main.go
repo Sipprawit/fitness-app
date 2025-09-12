@@ -87,6 +87,7 @@ func main() {
 		routes.PackagememberRoutes(api)
 
 		routes.ServicesRoutes(api)
+
 	}
 
 	r.GET("/", func(c *gin.Context) {

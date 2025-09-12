@@ -29,5 +29,6 @@ func HealthRoutes(r *gin.RouterGroup) {
 	{
 		nutrition.POST("", healthController.CreateOrUpdateNutrition)
 		nutrition.GET("", healthController.GetNutrition)
+		nutrition.GET("/user/:userID", healthController.GetNutritionByUserID)
 	}
 }

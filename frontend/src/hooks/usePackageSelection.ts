@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { Package, Service } from '../interface/package';
+import type { Package, Service } from '../interface/Package';
+
 
 export const usePackageSelection = (packages: Package[], services: Service[]) => {
   const [selectedPackageType, setSelectedPackageType] = useState<string>('');

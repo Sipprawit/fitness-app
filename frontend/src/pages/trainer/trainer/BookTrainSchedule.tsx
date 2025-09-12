@@ -164,9 +164,11 @@ const BookTrainSchedule: React.FC = () => {
     try {
       const userIdStr = localStorage.getItem("id");
       if (!userIdStr) {
-        Modal.error({
-          title: "เกิดข้อผิดพลาด",
-          content: "ไม่พบรหัสผู้ใช้งาน",
+        showNotification({
+          type: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          message: 'ไม่พบรหัสผู้ใช้งาน',
+          duration: 3000
         });
         return;
       }
@@ -201,15 +203,19 @@ const BookTrainSchedule: React.FC = () => {
           )
         );
       } else {
-        Modal.error({
-          title: "จองไม่สำเร็จ",
-          content: res?.data?.error || "เกิดข้อผิดพลาด",
+        showNotification({
+          type: 'error',
+          title: 'จองไม่สำเร็จ',
+          message: res?.data?.error || 'เกิดข้อผิดพลาด',
+          duration: 3000
         });
       }
     } catch (e) {
-      Modal.error({
-        title: "จองไม่สำเร็จ",
-        content: "เกิดข้อผิดพลาดในการจอง",
+      showNotification({
+        type: 'error',
+        title: 'จองไม่สำเร็จ',
+        message: 'เกิดข้อผิดพลาดในการจอง',
+        duration: 3000
       });
     } finally {
       setModalVisible(false);
@@ -218,7 +224,12 @@ const BookTrainSchedule: React.FC = () => {
 
   const handleCancelBooking = async (bookingId?: number) => {
     if (!bookingId) {
-      Modal.error({ title: "ยกเลิกไม่สำเร็จ", content: "ไม่พบ booking_id" });
+      showNotification({
+        type: 'error',
+        title: 'ยกเลิกไม่สำเร็จ',
+        message: 'ไม่พบ booking_id',
+        duration: 3000
+      });
       return;
     }
     try {
@@ -244,13 +255,20 @@ const BookTrainSchedule: React.FC = () => {
           )
         );
       } else {
-        Modal.error({
-          title: "ยกเลิกไม่สำเร็จ",
-          content: res?.data?.error || "เกิดข้อผิดพลาด",
+        showNotification({
+          type: 'error',
+          title: 'ยกเลิกไม่สำเร็จ',
+          message: res?.data?.error || 'เกิดข้อผิดพลาด',
+          duration: 3000
         });
       }
     } catch (e) {
-      Modal.error({ title: "ยกเลิกไม่สำเร็จ", content: "เกิดข้อผิดพลาด" });
+      showNotification({
+        type: 'error',
+        title: 'ยกเลิกไม่สำเร็จ',
+        message: 'เกิดข้อผิดพลาด',
+        duration: 3000
+      });
     }
   };
 
