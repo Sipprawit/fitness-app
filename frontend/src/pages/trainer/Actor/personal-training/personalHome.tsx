@@ -6,56 +6,78 @@ import {
   Select, 
   Button, 
   Space, 
-  Card,
-  Modal,
-  message
+  Card
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GetCustomersByTrainerID, GetPersonalTrainingProgramsByCustomerID, GetCustomerBookedTimes, DeletePersonalTrainingProgram } from '../../../../services/https';
 import type { UsersInterface } from '../../../../interface/IUser';
 import type { IPersonalTrain } from '../../../../interface/IPersonalTrain';
 import type { TrainBookingInterface } from '../../../../interface/ITrainBooking';
+import { ConfirmationDialog } from '../../../../components/ConfirmationDialog';
+import { useNotification } from '../../../../components/Notification/NotificationProvider';
 
 const { Title, Text } = Typography;
 
 const PersonalHome: React.FC = () => {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [customers, setCustomers] = useState<UsersInterface[]>([]);
   const [trainingPrograms, setTrainingPrograms] = useState<IPersonalTrain[]>([]);
   const [bookedTimes, setBookedTimes] = useState<TrainBookingInterface[]>([]);
   const [loading, setLoading] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    visible: boolean;
+    programId: number | null;
+  }>({ visible: false, programId: null });
 
   // ฟังก์ชันลบโปรแกรมการฝึก
   const handleDeleteProgram = (programId: number) => {
-    Modal.confirm({
-      title: 'ยืนยันการลบ',
-      content: 'คุณต้องการลบโปรแกรมการฝึกส่วนตัวนี้หรือไม่?',
-      okText: 'ลบ',
-      okType: 'danger',
-      cancelText: 'ยกเลิก',
-      onOk: async () => {
-        setLoading(true);
-        try {
-          const response = await DeletePersonalTrainingProgram(programId);
-          
-          if (response.status === 200) {
-            message.success('ลบโปรแกรมการฝึกสำเร็จ');
-            // ลบโปรแกรมออกจาก state โดยตรง (เร็วกว่า)
-            setTrainingPrograms(prevPrograms => 
-              prevPrograms.filter(program => program.ID !== programId)
-            );
-          } else {
-            message.error('เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก');
-          }
-        } catch (error) {
-          message.error('เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก');
-          console.error('Error:', error);
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
+    setConfirmDialog({ visible: true, programId });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDialog.programId) return;
+    
+    setLoading(true);
+    try {
+      const response = await DeletePersonalTrainingProgram(confirmDialog.programId);
+      
+      if (response.status === 200) {
+        showNotification({
+          type: 'success',
+          title: 'ลบโปรแกรมการฝึกสำเร็จ',
+          message: 'ลบโปรแกรมการฝึกส่วนตัวเรียบร้อยแล้ว',
+          duration: 2000
+        });
+        // ลบโปรแกรมออกจาก state โดยตรง (เร็วกว่า)
+        setTrainingPrograms(prevPrograms => 
+          prevPrograms.filter(program => program.ID !== confirmDialog.programId)
+        );
+      } else {
+        showNotification({
+          type: 'error',
+          title: 'ลบโปรแกรมการฝึกไม่สำเร็จ',
+          message: 'ไม่สามารถลบโปรแกรมการฝึกได้',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      showNotification({
+        type: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        message: 'เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก',
+        duration: 3000
+      });
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+      setConfirmDialog({ visible: false, programId: null });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ visible: false, programId: null });
   };
 
   // ดึงข้อมูลลูกค้าจาก API
@@ -91,6 +113,22 @@ const PersonalHome: React.FC = () => {
 
     fetchCustomers();
   }, []);
+
+  // รีเฟรชข้อมูลเมื่อกลับมาจากหน้าอื่น
+  useEffect(() => {
+    const handleFocus = () => {
+      if (selectedCustomer) {
+        const selectedCustomerData = customers.find(c => `${c.first_name} ${c.last_name}` === selectedCustomer);
+        if (selectedCustomerData?.ID) {
+          fetchTrainingPrograms(selectedCustomerData.ID);
+          fetchBookedTimes(selectedCustomerData.ID);
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [selectedCustomer, customers]);
 
   // ดึงข้อมูลโปรแกรมการฝึกส่วนตัวเมื่อเลือกลูกค้า
   const fetchTrainingPrograms = async (customerId: number) => {
@@ -247,7 +285,35 @@ const PersonalHome: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {bookedTimes.map((booking) => (
+                        {bookedTimes
+                          .filter((booking) => {
+                            // กรองเอาเฉพาะเวลาที่ยังไม่ได้เพิ่มโปรแกรมการฝึก
+                            const hasTrainingProgram = trainingPrograms.some(program => {
+                              const bookingDate = booking.schedule?.available_date;
+                              const programDate = program.date;
+                              const bookingStartTime = booking.schedule?.start_time;
+                              const programTime = program.time;
+                              
+                              // เปรียบเทียบวันที่และเวลา
+                              if (bookingDate && programDate) {
+                                const bookingDateStr = new Date(bookingDate).toDateString();
+                                const programDateStr = new Date(programDate).toDateString();
+                                
+                                if (bookingDateStr === programDateStr) {
+                                  // ถ้าวันที่ตรงกัน ให้เปรียบเทียบเวลา
+                                  if (bookingStartTime && programTime) {
+                                    const bookingTimeStr = new Date(bookingStartTime).toTimeString().substring(0, 5);
+                                    const programTimeStr = programTime.split(' - ')[0];
+                                    return bookingTimeStr === programTimeStr;
+                                  }
+                                }
+                              }
+                              return false;
+                            });
+                            
+                            return !hasTrainingProgram;
+                          })
+                          .map((booking) => (
                           <tr key={booking.ID}>
                             <td style={{ padding: '12px', border: '1px solid #d9d9d9' }}>
                               {booking.schedule?.available_date ? new Date(booking.schedule.available_date).toLocaleDateString('th-TH') : 'ไม่ระบุ'}
@@ -303,6 +369,37 @@ const PersonalHome: React.FC = () => {
                     ไม่พบเวลาที่จองไว้
                   </div>
                 )}
+                
+                {/* แสดงข้อความเมื่อเวลาทั้งหมดได้เพิ่มโปรแกรมการฝึกแล้ว */}
+                {bookedTimes.length > 0 && bookedTimes.filter((booking) => {
+                  const hasTrainingProgram = trainingPrograms.some(program => {
+                    const bookingDate = booking.schedule?.available_date;
+                    const programDate = program.date;
+                    const bookingStartTime = booking.schedule?.start_time;
+                    const programTime = program.time;
+                    
+                    if (bookingDate && programDate) {
+                      const bookingDateStr = new Date(bookingDate).toDateString();
+                      const programDateStr = new Date(programDate).toDateString();
+                      
+                      if (bookingDateStr === programDateStr) {
+                        if (bookingStartTime && programTime) {
+                          const bookingTimeStr = new Date(bookingStartTime).toTimeString().substring(0, 5);
+                          const programTimeStr = programTime.split(' - ')[0];
+                          return bookingTimeStr === programTimeStr;
+                        }
+                      }
+                    }
+                    return false;
+                  });
+                  return !hasTrainingProgram;
+                }).length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '24px', color: '#52c41a', backgroundColor: '#f6ffed', borderRadius: '8px', marginTop: '16px' }}>
+                    <Text style={{ color: '#52c41a', fontSize: '16px' }}>
+                      ✅ เวลาทั้งหมดได้เพิ่มโปรแกรมการฝึกแล้ว
+                    </Text>
+                  </div>
+                )}
               </Card>
             )}
             
@@ -350,9 +447,14 @@ const PersonalHome: React.FC = () => {
                                  console.log('Program ID:', program.ID);
                                  if (program.ID) {
                                    navigate(`/trainer/personal-training/edit/${program.ID}`);
-                                 } else {
-                                   message.error('ไม่พบ ID ของโปรแกรมการฝึก');
-                                 }
+                                   } else {
+                                    showNotification({
+                                      type: 'error',
+                                      title: 'เกิดข้อผิดพลาด',
+                                      message: 'ไม่พบ ID ของโปรแกรมการฝึก',
+                                      duration: 3000
+                                    });
+                                   }
                                }}
                              >
                                แก้ไข
@@ -385,6 +487,17 @@ const PersonalHome: React.FC = () => {
           </Card>
         )}
       </main>
+
+      <ConfirmationDialog
+        visible={confirmDialog.visible}
+        title="ยืนยันการลบ"
+        message="คุณต้องการลบโปรแกรมการฝึกส่วนตัวนี้หรือไม่?"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

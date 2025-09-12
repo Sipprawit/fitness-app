@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Layout, Menu, Button, message, theme } from "antd";
+import { Layout, Menu, Button, theme } from "antd";
+import { useNotification } from "../../components/Notification/NotificationProvider";
 
 import {
   UserOutlined,
@@ -16,6 +17,7 @@ import {
   ScheduleOutlined,
   AppstoreOutlined,
   TeamOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/gymmy2.png";
 
@@ -24,7 +26,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const FullLayout: React.FC = () => {
   const page = localStorage.getItem("page");
   const actor = localStorage.getItem("actor"); // ดึงประเภทผู้ใช้งานจาก localStorage
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const [collapsed, setCollapsed] = useState(false);
 
   const {
@@ -39,7 +41,12 @@ const FullLayout: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isLogin");
     localStorage.removeItem("actor"); // ลบ actor เมื่อ logout
-    messageApi.success("Logout successful");
+    showNotification({
+      type: 'success',
+      title: 'ออกจากระบบสำเร็จ',
+      message: 'ออกจากระบบเรียบร้อยแล้ว',
+      duration: 2000
+    });
     setTimeout(() => {
       location.href = "/login";
     }, 1000);
@@ -122,17 +129,6 @@ const FullLayout: React.FC = () => {
     menuItems = (
       <>
         <Menu.Item
-          key="dashboard"
-          onClick={() => setCurrentPage("dashboard")}
-          style={{ color: "white" }}
-        >
-          <Link to="/">
-            <HomeOutlined />
-            <span>หน้าหลัก</span>
-          </Link>
-        </Menu.Item>
-
-        <Menu.Item
           key="booking"
           onClick={() => setCurrentPage("booking")}
           style={{ color: "white" }}
@@ -151,6 +147,17 @@ const FullLayout: React.FC = () => {
           <Link to="/trainerbooking">
             <CalendarOutlined />
             <span>จองเทรนเนอร์</span>
+          </Link>
+        </Menu.Item>
+
+        <Menu.Item
+          key="trainingprograms"
+          onClick={() => setCurrentPage("trainingprograms")}
+          style={{ color: "white" }}
+        >
+          <Link to="/training-programs">
+            <AimOutlined />
+            <span>โปรแกรมฝึก</span>
           </Link>
         </Menu.Item>
 
@@ -177,6 +184,17 @@ const FullLayout: React.FC = () => {
             </Link>
           </Menu.Item>
         </Menu.SubMenu>
+
+        <Menu.Item
+          key="review"
+          onClick={() => setCurrentPage("review")}
+          style={{ color: "white" }}
+        >
+          <Link to="/review">
+            <StarOutlined />
+            <span>รีวิวและให้คะแนน</span>
+          </Link>
+        </Menu.Item>
 
         <Menu.Item
           key="group"
@@ -216,7 +234,6 @@ const FullLayout: React.FC = () => {
 
   return (
     <Layout>
-      {contextHolder}
       <Sider
         style={{
           backgroundColor: "#C50000",
@@ -254,7 +271,7 @@ const FullLayout: React.FC = () => {
 
             <Menu
               style={{ backgroundColor: "#C50000" }}
-              defaultSelectedKeys={[page ? page : "dashboard"]}
+              defaultSelectedKeys={[page ? page : "booking"]}
               mode="inline"
             >
               {menuItems}

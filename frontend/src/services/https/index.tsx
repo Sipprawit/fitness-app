@@ -327,6 +327,74 @@ async function GetUserBookings(userId: number) {
   }
 }
 
+// Get user's booked classes with class details
+async function GetUserBookedClasses(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/class-bookings/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// Get user's booked trainers with trainer details
+async function GetUserBookedTrainers(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/train-bookings/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+
+// ================= Health APIs =================
+async function GetHealth() {
+  try {
+    return await axios.get(`${apiUrl}/api/health`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateHealth(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/health`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Activity APIs =================
+async function GetActivities() {
+  try {
+    return await axios.get(`${apiUrl}/api/activity`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateActivity(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/activity`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateActivity(id: number, data: any) {
+  try {
+    return await axios.put(`${apiUrl}/api/activity/${id}`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteActivity(id: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/activity/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
 
 // ================= Nutrition APIs =================
 async function GetNutrition(date?: string) {
@@ -350,6 +418,105 @@ export async function getNutrition(date?: string) {
   try {
     const url = date ? `${apiUrl}/api/nutrition?date=${date}` : `${apiUrl}/api/nutrition`;
     return await axios.get(url, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Class Activities APIs =================
+async function GetAllClasses() {
+  try {
+    return await axios.get(`${apiUrl}/api/classes`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetClassById(id: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/classes/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetClassReviews(classId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/classes/${classId}/reviews`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Group APIs =================
+async function GetGroups() {
+  try {
+    return await axios.get(`${apiUrl}/api/groups`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateGroup(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/groups`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function JoinGroup(groupId: number) {
+  try {
+    return await axios.post(`${apiUrl}/api/group/${groupId}/join`, {}, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function LeaveGroup(groupId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/group/${groupId}/leave`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteGroup(groupId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/group/${groupId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Review APIs =================
+async function CreateReview(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/reviews`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateReview(reviewId: number, data: any) {
+  try {
+    return await axios.put(`${apiUrl}/api/reviews/${reviewId}`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteReview(reviewId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/reviews/${reviewId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetReviewsByItem(itemId: number, itemType: 'classes' | 'trainers') {
+  try {
+    return await axios.get(`${apiUrl}/api/reviews?reviewable_id=${itemId}&reviewable_type=${itemType}`, authConfig());
   } catch (e: any) {
     return e.response;
   }
@@ -387,7 +554,7 @@ async function UploadImage(file: File) {
   });
 }
 
-// ================= Package & Service APIs =================
+
 async function GetPackages() {
   try {
     return await axios.get(`${apiUrl}/api/packages`, authConfig());
@@ -487,6 +654,36 @@ export {
   CancelClassBooking,
   GetUserClassBooking,
   GetUserBookings,
+  GetUserBookedClasses,
+  GetUserBookedTrainers,
+
+  // Class Activities
+  GetAllClasses,
+  GetClassById,
+  GetClassReviews,
+
+  // Groups
+  GetGroups,
+  CreateGroup,
+  JoinGroup,
+  LeaveGroup,
+  DeleteGroup,
+
+  // Reviews
+  CreateReview,
+  UpdateReview,
+  DeleteReview,
+  GetReviewsByItem,
+
+  // Health
+  GetHealth,
+  CreateHealth,
+
+  // Activities
+  GetActivities,
+  CreateActivity,
+  UpdateActivity,
+  DeleteActivity,
 
   // Nutrition
   GetNutrition,

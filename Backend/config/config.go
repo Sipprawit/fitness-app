@@ -62,10 +62,16 @@ func SetupDatabase() {
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
 		&entity.ClassBooking{},
+
+
+		&entity.PersonalTrain{},
+
+		&entity.Review{},
+		&entity.WorkoutGroup{},
 		&entity.Package{},
 		&entity.Services{},
 		&entity.PackageMember{},
-		&entity.PersonalTrain{},
+
 	)
 
 	// Seed genders (idempotent)
@@ -94,7 +100,7 @@ func SetupDatabase() {
 
 	// Seed ClassActivity if empty
 	var existingClass entity.ClassActivity
-	if db.First(&existingClass).Error != nil {
+	if err := db.First(&existingClass).Error; err != nil && err == gorm.ErrRecordNotFound {
 		classes := []entity.ClassActivity{
 			{Name: "Yoga Beginner", Description: "คลาสโยคะสำหรับผู้เริ่มต้น", Date: time.Now().Format("2006-01-02"), StartTime: "13:00", EndTime: "14:00", Location: "Yoga Room", Capacity: 20, ImageURL: ""},
 			{Name: "HIIT Training", Description: "คลาสคาร์ดิโอความเข้มข้นสูง", Date: time.Now().Format("2006-01-02"), StartTime: "15:00", EndTime: "15:45", Location: "Weight Zone", Capacity: 12, ImageURL: ""},
@@ -106,7 +112,7 @@ func SetupDatabase() {
 
 	// Seed Equipment if empty
 	var existingEquipment entity.Equipment
-	if db.First(&existingEquipment).Error != nil {
+	if err := db.First(&existingEquipment).Error; err != nil && err == gorm.ErrRecordNotFound {
 		equipments := []entity.Equipment{
 			{Name: "ลู่วิ่ง A", Type: "คาร์ดิโอ", Zone: "โซนคาร์ดิโอ", Status: "Available", Condition: "Good", UsageHours: 120},
 			{Name: "ชุดดัมเบล", Type: "เวทเทรนนิ่ง", Zone: "โซนเวท", Status: "Available", Condition: "Good", UsageHours: 300},
@@ -118,7 +124,7 @@ func SetupDatabase() {
 
 	// Seed Facility if empty
 	var existingFacility entity.Facility
-	if db.First(&existingFacility).Error != nil {
+	if err := db.First(&existingFacility).Error; err != nil && err == gorm.ErrRecordNotFound {
 		facilities := []entity.Facility{
 			{Name: "ห้องโยคะ", Zone: "A", Status: "Open", Capacity: 20},
 			{Name: "โซนเวท", Zone: "B", Status: "Open", Capacity: 30},
@@ -227,4 +233,50 @@ func SetupDatabase() {
 			db.Create(&pkg)
 		}
 	}
+
+
+
+	// Seed Reviews if empty
+	var existingReview entity.Review
+	if err := db.First(&existingReview).Error; err != nil && err == gorm.ErrRecordNotFound {
+		// ดึงข้อมูลคลาสและเทรนเนอร์ที่สร้างไว้
+		var classActivity entity.ClassActivity
+		var trainer entity.Trainer
+		var user entity.Users
+
+		db.First(&classActivity)
+		db.First(&trainer)
+		db.First(&user)
+
+		// สร้างรีวิวสำหรับคลาส
+		reviews := []entity.Review{
+			{
+				Rating:         5,
+				Comment:        "คลาสโยคะดีมาก ได้ผ่อนคลายและยืดหยุ่นร่างกาย",
+				UserID:         user.ID,
+				ReviewableID:   classActivity.ID,
+				ReviewableType: "classes",
+			},
+			{
+				Rating:         4,
+				Comment:        "เทรนเนอร์สอนดีมาก มีเทคนิคที่เข้าใจง่าย",
+				UserID:         user.ID,
+				ReviewableID:   trainer.ID,
+				ReviewableType: "trainers",
+			},
+		}
+
+		for _, review := range reviews {
+			db.Create(&review)
+		}
+	}
+
+	// Try to add created_at column for group_members join table (ignore error if exists)
+	// ตรวจสอบว่าคอลัมน์มีอยู่แล้วหรือไม่ก่อนเพิ่ม
+	var columnExists bool
+	db.Raw("SELECT COUNT(*) > 0 FROM pragma_table_info('group_members') WHERE name = 'created_at'").Scan(&columnExists)
+	if !columnExists {
+		_ = db.Exec("ALTER TABLE group_members ADD COLUMN created_at DATETIME").Error // ignore error
+	}
+
 }

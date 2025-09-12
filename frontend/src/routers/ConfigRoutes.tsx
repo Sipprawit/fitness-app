@@ -8,14 +8,14 @@ import LoginPage from "../pages/auth/Login";
 import SignUpPage from "../pages/auth/Register";
 
 // Routes สำหรับลูกค้า (Customer)
-import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/ClassHome";
 import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
+import TrainingPrograms from "../pages/training/TrainingPrograms";
 import HealthHome from "../pages/health/Health/HealthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
-
-import Group from "../pages/group/groupHome";
+import GroupSystem from "../pages/group/GroupSystem";
+import ReviewSystem from "../pages/review/ReviewSystem";
 import Package from "../pages/package/packageHome";
 import Customer from "../pages/customer";
 import CustomerCreate from "../pages/admin/List/create";
@@ -69,11 +69,12 @@ const ConfigRoutes: React.FC = () => {
         }
       >
         {/* --- Routes สำหรับลูกค้า (Customer) --- */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/booking" replace />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/class" element={<Booking />} />
         <Route path="/class/booking-history" element={<BookClass />} />
         <Route path="/trainerbooking" element={<TrainerBooking />} />
+        <Route path="/training-programs" element={<TrainingPrograms />} />
         <Route path="/health/Health" element={
           <HealthActivityProvider>
             <HealthHome />
@@ -86,7 +87,8 @@ const ConfigRoutes: React.FC = () => {
             </NutritionProvider>
           </HealthActivityProvider>
         } />
-        <Route path="/group" element={<Group />} />
+        <Route path="/review" element={<ReviewSystem />} />
+        <Route path="/group" element={<GroupSystem />} />
         <Route path="/packages" element={<Package />} />
         <Route path="/customer" element={<Customer />} />
         <Route path="/customer/create" element={<CustomerCreate />} />

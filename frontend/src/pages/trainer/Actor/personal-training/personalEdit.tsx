@@ -7,21 +7,25 @@ import {
   Input,
   Button,
   Space,
-  Card,
-  message,
-  Modal
+  Card
 } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UpdatePersonalTrainingProgram, DeletePersonalTrainingProgram, GetPersonalTrainingProgramById } from '../../../../services/https';
+import { ConfirmationDialog } from '../../../../components/ConfirmationDialog';
+import { useNotification } from '../../../../components/Notification/NotificationProvider';
 
 const { Title, Text } = Typography;
 
 const PersonalEdit: React.FC = () => {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [programData, setProgramData] = useState<any>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    visible: boolean;
+  }>({ visible: false });
 
   useEffect(() => {
     const fetchProgramData = async () => {
@@ -38,12 +42,22 @@ const PersonalEdit: React.FC = () => {
             time: program.time,
           });
         } else {
-          message.error('ไม่สามารถดึงข้อมูลโปรแกรมการฝึกได้');
+          showNotification({
+            type: 'error',
+            title: 'ไม่สามารถดึงข้อมูลได้',
+            message: 'ไม่สามารถดึงข้อมูลโปรแกรมการฝึกได้',
+            duration: 3000
+          });
           navigate('/trainer/personal-training');
         }
       } catch (error) {
         console.error('Error fetching program data:', error);
-        message.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรแกรมการฝึก');
+        showNotification({
+          type: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          message: 'เกิดข้อผิดพลาดในการดึงข้อมูลโปรแกรมการฝึก',
+          duration: 3000
+        });
         navigate('/trainer/personal-training');
       }
     };
@@ -64,13 +78,28 @@ const PersonalEdit: React.FC = () => {
       const response = await UpdatePersonalTrainingProgram(parseInt(id), updateData);
       
       if (response.status === 200) {
-        message.success('แก้ไขโปรแกรมการฝึกสำเร็จ');
+        showNotification({
+          type: 'success',
+          title: 'แก้ไขโปรแกรมการฝึกสำเร็จ',
+          message: 'แก้ไขโปรแกรมการฝึกส่วนตัวเรียบร้อยแล้ว',
+          duration: 2000
+        });
         navigate('/trainer/personal-training');
       } else {
-        message.error('เกิดข้อผิดพลาดในการแก้ไขโปรแกรมการฝึก');
+        showNotification({
+          type: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          message: 'เกิดข้อผิดพลาดในการแก้ไขโปรแกรมการฝึก',
+          duration: 3000
+        });
       }
     } catch (error) {
-      message.error('เกิดข้อผิดพลาดในการแก้ไขโปรแกรมการฝึก');
+      showNotification({
+        type: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        message: 'เกิดข้อผิดพลาดในการแก้ไขโปรแกรมการฝึก',
+        duration: 3000
+      });
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -79,32 +108,48 @@ const PersonalEdit: React.FC = () => {
 
   const handleDelete = () => {
     if (!id) return;
+    setConfirmDialog({ visible: true });
+  };
 
-    Modal.confirm({
-      title: 'ยืนยันการลบ',
-      content: 'คุณต้องการลบโปรแกรมการฝึกส่วนตัวนี้หรือไม่?',
-      okText: 'ลบ',
-      okType: 'danger',
-      cancelText: 'ยกเลิก',
-      onOk: async () => {
-        setLoading(true);
-        try {
-          const response = await DeletePersonalTrainingProgram(parseInt(id));
-          
-          if (response.status === 200) {
-            message.success('ลบโปรแกรมการฝึกสำเร็จ');
-            navigate('/trainer/personal-training');
-          } else {
-            message.error('เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก');
-          }
-        } catch (error) {
-          message.error('เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก');
-          console.error('Error:', error);
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
+  const handleConfirmDelete = async () => {
+    if (!id) return;
+    
+    setLoading(true);
+    try {
+      const response = await DeletePersonalTrainingProgram(parseInt(id));
+      
+      if (response.status === 200) {
+        showNotification({
+          type: 'success',
+          title: 'ลบโปรแกรมการฝึกสำเร็จ',
+          message: 'ลบโปรแกรมการฝึกส่วนตัวเรียบร้อยแล้ว',
+          duration: 2000
+        });
+        navigate('/trainer/personal-training');
+      } else {
+        showNotification({
+          type: 'error',
+          title: 'ลบโปรแกรมการฝึกไม่สำเร็จ',
+          message: 'ไม่สามารถลบโปรแกรมการฝึกได้',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      showNotification({
+        type: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        message: 'เกิดข้อผิดพลาดในการลบโปรแกรมการฝึก',
+        duration: 3000
+      });
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+      setConfirmDialog({ visible: false });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ visible: false });
   };
 
   const onCancel = () => {
@@ -242,6 +287,17 @@ const PersonalEdit: React.FC = () => {
           </Form>
         </Card>
       </main>
+
+      <ConfirmationDialog
+        visible={confirmDialog.visible}
+        title="ยืนยันการลบ"
+        message="คุณต้องการลบโปรแกรมการฝึกส่วนตัวนี้หรือไม่?"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

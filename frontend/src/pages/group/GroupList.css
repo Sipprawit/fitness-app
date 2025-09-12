@@ -1,0 +1,151 @@
+.group-list-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+  
+  .filter-bar input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #d32f2f;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .filter-bar input[type="text"]:focus {
+    border-color: #a02727;
+  }
+  
+  .search-button {
+    padding: 8px 16px;
+    background-color: #d32f2f;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .search-button:hover {
+    background-color: #a02727;
+  }
+  
+  .create-group-btn {
+    display: block;
+    margin: 0 auto 30px auto;
+    padding: 10px 24px;
+    background-color: #d32f2f;
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-group-btn:hover {
+    background-color: #a02727;
+  }
+  
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .group-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  
+  .group-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+  }
+  
+  .group-card h4 {
+    color: #d32f2f;
+    margin-bottom: 12px;
+    font-size: 1.3rem;
+  }
+  
+  .group-card p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: #555;
+  }
+  
+  .join-button {
+    margin-top: 18px;
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.3s ease;
+  }
+  
+  .join-button:hover {
+    background-color: #a02727;
+  }
+  
+  /* เพิ่มใน src/components/GroupSystem.css หรือ App.css */
+  
+  .search-bar-container {
+    display: flex;
+    justify-content: center; /* จัดให้อยู่ตรงกลาง */
+    margin-bottom: 20px;
+    /* ถ้าต้องการให้มีปุ่ม "ค้นหา" กลับมา ให้ลบ justify-content: center; ออก แล้วเปลี่ยนเป็น align-items: center; */
+  }
+  
+  .group-search-input {
+    /* === จุดที่แก้ไข: กำหนดความกว้าง (width) ของ input field === */
+    width: 300px; /* ลองเปลี่ยนค่านี้ได้ตามต้องการ เช่น 250px, 400px, 50% */
+    /* === สิ้นสุดจุดที่แก้ไข === */
+  
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    outline: none;
+  }
+  
+  /* --- สไตล์สำหรับแถบค้นหาใน GroupSystem --- */
+  
+  /* Container ของแถบค้นหา */
+  .filter-bar {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto 24px auto; /* จัดกึ่งกลางและเว้นวรรคข้างล่าง */
+  }
+  
+  /* กล่องใส่ข้อความค้นหา */
+  .search-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }

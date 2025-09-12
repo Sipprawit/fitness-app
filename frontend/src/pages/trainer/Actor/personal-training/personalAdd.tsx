@@ -7,16 +7,17 @@ import {
   Input,
   Button,
   Space,
-  Card,
-  message
+  Card
 } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GetTrainerById, GetNutritionByUserID, CreatePersonalTrainingProgram } from '../../../../services/https';
+import { useNotification } from '../../../../components/Notification/NotificationProvider';
 
 const { Title, Text } = Typography;
 
 const PersonalAdd: React.FC = () => {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
   const location = useLocation();
   const [form] = Form.useForm();
   const [customerName, setCustomerName] = useState<string>('');
@@ -168,12 +169,22 @@ const PersonalAdd: React.FC = () => {
       console.log('Trainer ID from localStorage:', trainerId);
       
       if (!customerId || customerId === 0) {
-        message.error('ไม่พบข้อมูลลูกค้า กรุณาเลือกลูกค้าก่อน');
+        showNotification({
+          type: 'error',
+          title: 'ไม่พบข้อมูลลูกค้า',
+          message: 'กรุณาเลือกลูกค้าก่อน',
+          duration: 3000
+        });
         return;
       }
       
       if (!trainerId || trainerId === 0) {
-        message.error('ไม่พบข้อมูลเทรนเนอร์ กรุณาล็อกอินใหม่');
+        showNotification({
+          type: 'error',
+          title: 'ไม่พบข้อมูลเทรนเนอร์',
+          message: 'กรุณาล็อกอินใหม่',
+          duration: 3000
+        });
         return;
       }
       
@@ -193,14 +204,29 @@ const PersonalAdd: React.FC = () => {
       console.log('Create program response:', response);
 
       if (response.status === 201 || response.status === 200) {
-        message.success('เพิ่มโปรแกรมการฝึกส่วนตัวสำเร็จ');
+        showNotification({
+          type: 'success',
+          title: 'เพิ่มโปรแกรมการฝึกส่วนตัวสำเร็จ',
+          message: 'เพิ่มโปรแกรมการฝึกส่วนตัวเรียบร้อยแล้ว',
+          duration: 2000
+        });
         navigate('/trainer/personal-training');
       } else {
-        message.error('เกิดข้อผิดพลาดในการเพิ่มโปรแกรมการฝึกส่วนตัว');
+        showNotification({
+          type: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          message: 'เกิดข้อผิดพลาดในการเพิ่มโปรแกรมการฝึกส่วนตัว',
+          duration: 3000
+        });
         console.error('Error response:', response.data);
       }
     } catch (error) {
-      message.error('เกิดข้อผิดพลาดในการเพิ่มโปรแกรมการฝึกส่วนตัว');
+      showNotification({
+        type: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        message: 'เกิดข้อผิดพลาดในการเพิ่มโปรแกรมการฝึกส่วนตัว',
+        duration: 3000
+      });
       console.error('Error:', error);
     }
   };

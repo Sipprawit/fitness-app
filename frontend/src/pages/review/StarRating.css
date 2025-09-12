@@ -1,0 +1,150 @@
+/* src/pages/review/StarRating.css - Enhanced Star Rating with Animations */
+
+.star-rating {
+    display: inline-flex;
+    direction: ltr;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .star {
+    color: #e0e0e0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+  
+  .star:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+  
+  .star.filled {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    animation: starGlow 0.6s ease-out;
+  }
+  
+  .star.filled::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: starPulse 0.6s ease-out;
+    pointer-events: none;
+  }
+  
+  /* Animation for when a star is clicked */
+  @keyframes starGlow {
+    0% {
+      transform: scale(1);
+      text-shadow: 0 0 0 rgba(255, 215, 0, 0.5);
+    }
+    50% {
+      transform: scale(1.3);
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+    100% {
+      transform: scale(1);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+  }
+  
+  @keyframes starPulse {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2);
+      opacity: 0;
+    }
+  }
+  
+  /* Read-only mode styling */
+  .star.read-only {
+    cursor: default;
+  }
+  
+  .star.read-only:hover {
+    transform: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+  
+  /* Different color schemes for different contexts */
+  .star-rating.primary .star.filled {
+    color: #4ecdc4;
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+  }
+  
+  .star-rating.success .star.filled {
+    color: #2ecc71;
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+  }
+  
+  .star-rating.warning .star.filled {
+    color: #f39c12;
+    text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+  }
+  
+  .star-rating.danger .star.filled {
+    color: #e74c3c;
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+  }
+  
+  /* Responsive sizing */
+  .star-rating.small .star {
+    font-size: 16px;
+  }
+  
+  .star-rating.medium .star {
+    font-size: 24px;
+  }
+  
+  .star-rating.large .star {
+    font-size: 32px;
+  }
+  
+  /* Hover effect for interactive stars */
+  .star-rating:not(.read-only) .star:hover {
+    color: #ffd700;
+    transform: scale(1.1);
+  }
+  
+  /* Smooth transition for rating changes */
+  .star-rating .star {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Focus styles for accessibility */
+  .star:focus {
+    outline: 2px solid #4ecdc4;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  
+  /* Loading state */
+  .star-rating.loading .star {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  .star-rating.loading .star.filled {
+    animation: starShimmer 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes starShimmer {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }

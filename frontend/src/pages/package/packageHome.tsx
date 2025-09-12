@@ -9,7 +9,12 @@ import { PackageStatus } from '../../components/package/PackageStatus';
 import { PackageSelectors } from '../../components/package/PackageSelectors';
 import { PackageDetails } from '../../components/package/PackageDetails';
 
-const { Title, Text } = Typography;
+import { CurrentPackageDetails } from '../../components/package/CurrentPackageDetails';
+import { useNotification } from '../../components/Notification/NotificationProvider';
+import { CUSTOMER_THEME, PAGE_STYLES } from '../../constants/theme';
+
+
+const { Text } = Typography;
 
 export const PackageHome: React.FC = () => {
   const [showPackageTypeDropdown, setShowPackageTypeDropdown] = useState(false);
@@ -18,6 +23,9 @@ export const PackageHome: React.FC = () => {
   const navigate = useNavigate();
   const { packages, services, loading, error } = usePackageData();
   const userPackageStatus = useUserPackageStatus();
+
+  const { showNotification } = useNotification();
+
 
   console.log('PackageHome - data:', { packages, services, loading, error });
   const {
@@ -40,7 +48,8 @@ export const PackageHome: React.FC = () => {
   
   // Event handlers
   const handleSignup = async () => {
-    const result = await handlePackageSignup(selectedPackage);
+
+    const result = await handlePackageSignup(selectedPackage, showNotification);
     if (result.shouldRedirect) {
         navigate('/login');
     } else if (result.shouldReload) {
@@ -49,7 +58,9 @@ export const PackageHome: React.FC = () => {
   };
 
   const handleCancelPackage = async () => {
-    const result = await handlePackageCancel();
+
+    const result = await handlePackageCancel(showNotification);
+
     if (result.shouldRedirect) {
         navigate('/login');
     } else if (result.shouldReload) {
@@ -58,7 +69,9 @@ export const PackageHome: React.FC = () => {
   };
 
   const handleChangePackage = async () => {
-    const result = await handlePackageChange(selectedPackage);
+
+    const result = await handlePackageChange(selectedPackage, showNotification);
+
     if (result.shouldRedirect) {
         navigate('/login');
     } else if (result.shouldReload) {
@@ -72,11 +85,10 @@ export const PackageHome: React.FC = () => {
   if (loading) {
     return (
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh',
-        backgroundColor: '#f4f6f8ff'
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        fontSize: '1.2rem',
       }}>
         <Text>กำลังโหลดข้อมูล...</Text>
       </div>
@@ -86,91 +98,73 @@ export const PackageHome: React.FC = () => {
   if (error) {
     return (
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh',
-        backgroundColor: '#f4f6f8ff'
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        fontSize: '1.2rem',
       }}>
-        <Text type="danger">{error}</Text>
+        <Text style={{ color: CUSTOMER_THEME.primary }}>{error}</Text>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100%',
-        margin: 0,
-        backgroundColor: '#f4f6f8ff',
-        overflowX: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-      }}
-    >
-      <main
-        style={{
-          flex: 1,
-          width: '100%',
-          padding: '16px',
-          overflowY: 'auto',
-          boxSizing: 'border-box',
-          maxWidth: '100%',
-        }}
-      >
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'flex-start', 
-          marginBottom: 48 
-        }}>
-          <div style={{ textAlign: 'left' }}>
-            <Title level={2} style={{ color: '#010000ff', margin: 0 }}>
-            แพ็คเกจสมาชิก
-          </Title>
-          </div>
-          <PackageStatus
-            hasPackage={userPackageStatus.hasPackage}
-            packageName={userPackageStatus.packageName}
-            packageType={userPackageStatus.packageType}
-            onCancelPackage={handleCancelPackage}
+    <div style={PAGE_STYLES.container}>
+      <div style={PAGE_STYLES.header}>
+        <h1 style={PAGE_STYLES.title}>แพ็คเกจสมาชิก</h1>
+        <p style={PAGE_STYLES.subtitle}>
+          เลือกแพ็คเกจที่เหมาะกับความต้องการของคุณ
+        </p>
+      </div>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <PackageStatus
+          hasPackage={userPackageStatus.hasPackage}
+          packageName={userPackageStatus.packageName}
+          packageType={userPackageStatus.packageType}
+          onCancelPackage={handleCancelPackage}
+        />
+      </div>
+
+      <Row gutter={[32, 16]} style={{ width: '100%', maxWidth: '1200px' }}>
+        <Col xs={24} lg={8} xl={6}>
+          <PackageSelectors
+            packageTypes={packageTypes}
+            packages={packages}
+            services={services}
+            selectedPackageType={selectedPackageType}
+            selectedService={selectedService}
+            showPackageTypeDropdown={showPackageTypeDropdown}
+            showServiceDropdown={showServiceDropdown}
+            onPackageTypeChange={handlePackageTypeChange}
+            onServiceChange={(service) => {
+              console.log('onServiceChange called with:', service);
+              setSelectedService(service);
+            }}
+            onPackageTypeDropdownChange={setShowPackageTypeDropdown}
+            onServiceDropdownChange={setShowServiceDropdown}
+            getSelectedPackageTypeName={getSelectedPackageTypeName}
+            getSelectedServiceName={getSelectedServiceName}
           />
-        </div>
+        </Col>
 
-        <Row gutter={[32, 16]}>
-          <Col xs={24} lg={8} xl={6}>
-            <PackageSelectors
-              packageTypes={packageTypes}
-              packages={packages}
-              services={services}
-              selectedPackageType={selectedPackageType}
-              selectedService={selectedService}
-              showPackageTypeDropdown={showPackageTypeDropdown}
-              showServiceDropdown={showServiceDropdown}
-              onPackageTypeChange={handlePackageTypeChange}
-              onServiceChange={(service) => {
-                console.log('onServiceChange called with:', service);
-                setSelectedService(service);
-              }}
-              onPackageTypeDropdownChange={setShowPackageTypeDropdown}
-              onServiceDropdownChange={setShowServiceDropdown}
-              getSelectedPackageTypeName={getSelectedPackageTypeName}
-              getSelectedServiceName={getSelectedServiceName}
+        <Col xs={24} lg={16} xl={14}>
+          {userPackageStatus.hasPackage ? (
+            <CurrentPackageDetails
+              packageName={userPackageStatus.packageName}
+              packageType={userPackageStatus.packageType}
+              onCancelPackage={handleCancelPackage}
             />
-          </Col>
-
-          <Col xs={24} lg={16} xl={14}>
+          ) : (
             <PackageDetails
               selectedPackage={selectedPackage}
               hasPackage={userPackageStatus.hasPackage}
               onSignup={handleSignup}
               onChangePackage={handleChangePackage}
             />
-          </Col>
-        </Row>
-      </main>
+          )}
+        </Col>
+      </Row>
     </div>
   );
 };

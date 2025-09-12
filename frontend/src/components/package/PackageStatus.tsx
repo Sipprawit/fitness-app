@@ -1,11 +1,15 @@
 import React from 'react';
+
 import { Button } from 'antd';
+
 
 interface PackageStatusProps {
   hasPackage: boolean;
   packageName?: string;
   packageType?: string;
+
   onCancelPackage: () => void;
+
 }
 
 export const PackageStatus: React.FC<PackageStatusProps> = ({
@@ -17,9 +21,9 @@ export const PackageStatus: React.FC<PackageStatusProps> = ({
   return (
     <div style={{ 
       display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'flex-end', 
-      gap: 12 
+
+      alignItems: 'flex-end'
+
     }}>
       <div style={{ 
         padding: '8px 16px', 
@@ -57,6 +61,7 @@ export const PackageStatus: React.FC<PackageStatusProps> = ({
           ยกเลิกการสมัครแพ็คเกจ
         </Button>
       )}
+
     </div>
   );
 };
