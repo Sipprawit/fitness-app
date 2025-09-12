@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../../components/Notification/NotificationProvider";
+import { CUSTOMER_THEME, PAGE_STYLES, CARD_STYLES, BUTTON_STYLES } from "../../constants/theme";
 
 interface UserProfile {
   id: number;
@@ -178,11 +179,76 @@ function ProfileCustomer() {
     }
   };
 
+  const handleAvatarDelete = async () => {
+    try {
+      setUploading(true);
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "ไม่พบ token กรุณาเข้าสู่ระบบใหม่",
+          duration: 3000
+        });
+        return;
+      }
+
+      console.log("Deleting avatar...");
+      const response = await fetch("http://localhost:8000/api/user/avatar", {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("Delete response status:", response.status);
+      console.log("Delete response ok:", response.ok);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Delete result:", result);
+        setProfile(prev => prev ? { ...prev, avatar: "" } : null);
+        showNotification({
+          type: "success",
+          title: "สำเร็จ",
+          message: "ลบรูปโปรไฟล์สำเร็จ!",
+          duration: 2000
+        });
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Delete error response:", errorData);
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: errorData.error || `เกิดข้อผิดพลาดในการลบรูป (${response.status})`,
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting avatar:", error);
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
+        duration: 3000
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
 
   if (loading) {
     return (
-      <div style={loadingStyle}>
-        <div style={spinnerStyle}>⏳</div>
+      <div style={{ 
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        fontSize: '1.2rem',
+      }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
         <p>กำลังโหลดข้อมูล...</p>
       </div>
     );
@@ -190,9 +256,14 @@ function ProfileCustomer() {
 
   if (!profile) {
     return (
-      <div style={errorStyle}>
-        <h2>ไม่พบข้อมูลโปรไฟล์</h2>
-        <button onClick={() => navigate("/login")} style={buttonStyle}>
+      <div style={{ 
+        ...PAGE_STYLES.container,
+        justifyContent: 'center',
+        color: CUSTOMER_THEME.primary,
+        textAlign: 'center',
+      }}>
+        <h2 style={{ color: CUSTOMER_THEME.primary }}>ไม่พบข้อมูลโปรไฟล์</h2>
+        <button onClick={() => navigate("/login")} style={BUTTON_STYLES.primary}>
           กลับไปหน้าเข้าสู่ระบบ
         </button>
       </div>
@@ -200,15 +271,15 @@ function ProfileCustomer() {
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={PAGE_STYLES.container}>
       {/* Header */}
-      <div style={headerStyle}>
-        <h1 style={titleStyle}> โปรไฟล์ส่วนตัว</h1>
-        <p style={subtitleStyle}>จัดการข้อมูลส่วนตัว</p>
+      <div style={PAGE_STYLES.header}>
+        <h1 style={PAGE_STYLES.title}>โปรไฟล์ส่วนตัว</h1>
+        <p style={PAGE_STYLES.subtitle}>จัดการข้อมูลส่วนตัว</p>
       </div>
 
       {/* Profile Card */}
-      <div style={profileCardStyle}>
+      <div style={CARD_STYLES.default}>
         {/* Avatar Section */}
         <div style={avatarSectionStyle}>
           <div style={avatarContainerStyle}>
@@ -285,19 +356,39 @@ function ProfileCustomer() {
                   onClick={handleSave} 
                   disabled={saving}
                   style={{
-                    ...saveButtonStyle,
-                    opacity: saving ? 0.7 : 1
+                    ...BUTTON_STYLES.primary,
+                    opacity: saving ? 0.7 : 1,
+                    flex: 1
                   }}
                 >
                   {saving ? "⏳ บันทึก..." : "💾 บันทึกข้อมูล"}
                 </button>
                 <button 
                   onClick={() => setIsEditing(false)}
-                  style={cancelButtonStyle}
+                  style={{
+                    ...BUTTON_STYLES.secondary,
+                    flex: 1
+                  }}
                 >
                   ❌ ยกเลิกการแก้ไข
                 </button>
               </div>
+              
+              {profile.avatar && (
+                <div style={deleteAvatarSectionStyle}>
+                  <button 
+                    onClick={handleAvatarDelete}
+                    disabled={uploading}
+                    style={{
+                      ...BUTTON_STYLES.danger,
+                      opacity: uploading ? 0.7 : 1,
+                      width: '100%'
+                    }}
+                  >
+                    {uploading ? "⏳ กำลังลบ..." : "🗑️ ลบรูปโปรไฟล์"}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div style={infoDisplayStyle}>
@@ -315,7 +406,7 @@ function ProfileCustomer() {
 
               <button 
                 onClick={() => setIsEditing(true)}
-                style={editButtonStyle}
+                style={BUTTON_STYLES.primary}
               >
                 💪 แก้ไขข้อมูลนักกีฬา
               </button>
@@ -435,6 +526,27 @@ const uploadButtonStyle: React.CSSProperties = {
   cursor: "pointer",
   padding: 0,
   margin: 0,
+};
+
+
+const deleteAvatarSectionStyle: React.CSSProperties = {
+  marginTop: "1rem",
+  paddingTop: "1rem",
+  borderTop: "1px solid #e5e7eb",
+};
+
+const deleteAvatarButtonStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "0.75rem 1rem",
+  background: "#dc2626",
+  color: "white",
+  border: "none",
+  borderRadius: "10px",
+  fontSize: "1rem",
+  fontWeight: "600",
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
 };
 
 const nameStyle: React.CSSProperties = {

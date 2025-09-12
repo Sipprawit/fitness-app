@@ -2,6 +2,7 @@ package Health
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"example.com/fitness-backend/config"
@@ -235,6 +236,25 @@ func GetNutrition(c *gin.Context) {
 			"carb_g":                 meal.CarbG,
 		}
 		c.JSON(http.StatusOK, gin.H{"data": nutritionWithMacros})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": nutrition})
+}
+
+// GET /api/nutrition/user/:userID
+func GetNutritionByUserID(c *gin.Context) {
+	userIDStr := c.Param("userID")
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	db := config.DB()
+	var nutrition entity.Nutrition
+	if err := db.Where("user_id = ?", userID).Order("date desc").First(&nutrition).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"data": nil, "message": "No nutrition data found for this user"})
 		return
 	}
 

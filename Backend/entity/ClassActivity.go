@@ -15,4 +15,7 @@ type ClassActivity struct {
 	Capacity            int       `json:"capacity"`
 	ImageURL            string    `json:"imageUrl"`
 	CurrentParticipants int       `gorm:"-" json:"currentParticipants"`
+	AverageRating       float64   `json:"averageRating" gorm:"default:0"`
+	ReviewCount         uint      `json:"reviewCount" gorm:"default:0"`
+	Reviews             []Review  `gorm:"polymorphic:Reviewable;polymorphicValue:classes" json:"reviews"`
 }
