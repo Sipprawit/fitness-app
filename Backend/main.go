@@ -8,6 +8,9 @@ import (
 	"example.com/fitness-backend/config"
 
 	"example.com/fitness-backend/controllers/genders"
+	pkg "example.com/fitness-backend/controllers/package"
+	"example.com/fitness-backend/controllers/packagemember"
+	"example.com/fitness-backend/controllers/services"
 
 	"example.com/fitness-backend/controllers/uploads"
 	"example.com/fitness-backend/controllers/users"
@@ -77,6 +80,27 @@ func main() {
 
 		// Facility Routes
 		routes.FacilityRoutes(api)
+
+		// Package Routes
+		api.GET("/packages", pkg.GetAll)
+		api.GET("/packages/:id", pkg.Get)
+		api.POST("/packages", pkg.Create)
+		api.PUT("/packages/:id", pkg.Update)
+		api.DELETE("/packages/:id", pkg.Delete)
+
+		// Service Routes
+		api.GET("/services", services.GetAll)
+		api.GET("/services/:id", services.Get)
+		api.POST("/services", services.Create)
+		api.PUT("/services/:id", services.Update)
+		api.DELETE("/services/:id", services.Delete)
+
+		// Package Member Routes
+		api.GET("/package-members/user/:user_id", packagemember.GetByUserID)
+		api.POST("/package-members", packagemember.Create)
+		api.PUT("/package-members/user/:user_id", packagemember.UpdateByUserID)
+		api.DELETE("/package-members/user/:user_id", packagemember.DeleteByUserID)
+
 	}
 
 	r.GET("/", func(c *gin.Context) {

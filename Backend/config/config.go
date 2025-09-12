@@ -52,9 +52,9 @@ func SetupDatabase() {
 		&entity.ClassActivity{},
 		&entity.Equipment{},
 		&entity.Facility{},
-		&entity.Users{},   
-		&entity.Trainer{}, 
-		&entity.Admin{},   
+		&entity.Users{},
+		&entity.Trainer{},
+		&entity.Admin{},
 		&entity.Health{},
 		&entity.Activity{},
 		&entity.Nutrition{},
@@ -62,7 +62,10 @@ func SetupDatabase() {
 		&entity.TrainerSchedule{},
 		&entity.TrainBooking{},
 		&entity.ClassBooking{},
-
+		&entity.Package{},
+		&entity.Services{},
+		&entity.PackageMember{},
+		&entity.PersonalTrain{},
 	)
 
 	// Seed genders (idempotent)
@@ -88,7 +91,6 @@ func SetupDatabase() {
 	hashedPassword, _ := HashPassword("123456")
 	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
 	formattedBirthDay := BirthDay.Format("2006-01-02")
-
 
 	// Seed ClassActivity if empty
 	var existingClass entity.ClassActivity
@@ -146,5 +148,83 @@ func SetupDatabase() {
 	db.Where(entity.Users{Email: "customer@gmail.com"}).FirstOrInit(&customer)
 	if customer.ID == 0 {
 		db.Create(&entity.Users{FirstName: "Customer", LastName: "User", Email: "customer@gmail.com", Age: 25, Password: hashedPassword, BirthDay: formattedBirthDay, GenderID: 2})
+	}
+
+	// Services Data
+	services := []entity.Services{
+		{
+			Service: "ไม่เลือก",
+			Detail:  "-",
+		},
+		{
+			Service: "บริการห้องซาวน่า",
+			Detail:  "ใช้บริการห้องซาวน่าฟรี",
+		},
+		{
+			Service: "บริการสระว่ายน้ำ",
+			Detail:  "ใช้บริการสระว่ายน้ำฟรี",
+		},
+	}
+
+	// Create services if they don't exist
+	for _, service := range services {
+		var existingService entity.Services
+		if tx := db.Where("service = ?", service.Service).First(&existingService); tx.RowsAffected == 0 {
+			db.Create(&service)
+		}
+	}
+
+	// Package Data
+	packages := []entity.Package{
+		{
+			PackageName: "ฟิตตึงเปรี๊ยะ",
+			Type:        "รายเดือน",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดเดือน",
+			ServiceID:   1,
+			Price:       1290,
+		},
+		{
+			PackageName: "ฟิตปึ๋งปั๋ง",
+			Type:        "รายปี",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดปี",
+			ServiceID:   1,
+			Price:       10000,
+		},
+		{
+			PackageName: "ฟิตฮึดฮัด",
+			Type:        "รายเดือน",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดเดือน",
+			ServiceID:   2,
+			Price:       1890,
+		},
+		{
+			PackageName: "ฟิตฮึฮึ",
+			Type:        "รายปี",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดปี",
+			ServiceID:   2,
+			Price:       16000,
+		},
+		{
+			PackageName: "ฟิตปุ๋งปุ๋ง",
+			Type:        "รายเดือน",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดเดือน",
+			ServiceID:   3,
+			Price:       1390,
+		},
+		{
+			PackageName: "ฟิตบุ๋งบุ๋ง",
+			Type:        "รายปี",
+			Detail:      "เข้าใช้บริการฟิตเนสฟรีตลอดปี",
+			ServiceID:   3,
+			Price:       12000,
+		},
+	}
+
+	// Create packages if they don't exist
+	for _, pkg := range packages {
+		var existingPackage entity.Package
+		if tx := db.Where("package_name = ? AND type = ?", pkg.PackageName, pkg.Type).First(&existingPackage); tx.RowsAffected == 0 {
+			db.Create(&pkg)
+		}
 	}
 }

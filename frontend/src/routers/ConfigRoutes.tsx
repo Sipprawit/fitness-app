@@ -12,7 +12,7 @@ import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/ClassHome";
 import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
-import HealthHome from "../pages/health/Health/healthHome";
+import HealthHome from "../pages/health/Health/HealthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
 
 import Group from "../pages/group/groupHome";
@@ -24,6 +24,8 @@ import CustomerEdit from "../pages/admin/List/edit";
 // Routes สำหรับเทรนเนอร์ (Trainer)
 import TrainerDashboard from "../pages/trainer/Actor/trainerHome";
 import CreateProgram from "../pages/trainer/Actor/personal-training/personalHome";
+import PersonalAdd from "../pages/trainer/Actor/personal-training/personalAdd";
+import PersonalEdit from "../pages/trainer/Actor/personal-training/personalEdit";
 import TrainerProfile from "../pages/trainer/Actor/trainerProfile";
 import AddTrainer from "../pages/trainer/Actor/addTrainer";
 import EditTrainer from "../pages/trainer/Actor/editTrainer";
@@ -96,6 +98,11 @@ const ConfigRoutes: React.FC = () => {
         {/* --- Routes สำหรับเทรนเนอร์ (Trainer) --- */}
         <Route path="/trainer" element={<TrainerDashboard />} />
         <Route path="/trainer/create-program" element={<CreateProgram />} />
+        <Route path="/trainer/create-program/add" element={<PersonalAdd />} />
+        <Route path="/trainer/personal-training" element={<CreateProgram />} />
+        <Route path="/trainer/personal-training/add" element={<PersonalAdd />} />
+        <Route path="/trainer/create-program/edit/:id" element={<PersonalEdit />} />
+        <Route path="/trainer/personal-training/edit/:id" element={<PersonalEdit />} />
         <Route path="/trainer/profile" element={<TrainerProfile />} />
         <Route path="/trainer/profile/addTrainer" element={<AddTrainer />} />
         <Route path="/trainer/edit/:id" element={<EditTrainer />} />

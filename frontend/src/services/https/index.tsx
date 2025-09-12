@@ -214,6 +214,82 @@ async function GetBookingsByUserId(userId: number) {
   }
 }
 
+async function GetCustomersByTrainerID() {
+  try {
+    return await axios.get(`${apiUrl}/api/train-bookings/customers`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// Personal Training APIs
+async function GetPersonalTrainingProgramsByCustomerID(customerID: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/personal-training/customer/${customerID}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetPersonalTrainingProgramsByTrainerID() {
+  try {
+    return await axios.get(`${apiUrl}/api/personal-training/trainer`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Nutrition APIs =================
+async function GetNutritionByUserID(userID: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/nutrition/user/${userID}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Train Booking APIs =================
+async function GetCustomerBookedTimes(customerID: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/train-bookings/customer/${customerID}/times`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Personal Training APIs =================
+async function CreatePersonalTrainingProgram(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/personal-training`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdatePersonalTrainingProgram(id: number, data: any) {
+  try {
+    return await axios.put(`${apiUrl}/api/personal-training/${id}`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeletePersonalTrainingProgram(id: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/personal-training/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetPersonalTrainingProgramById(id: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/personal-training/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
 // ================= Class Booking APIs =================
 async function BookClass(class_activity_id: number, user_id: number, status: string = "Confirmed") {
   try {
@@ -311,6 +387,59 @@ async function UploadImage(file: File) {
   });
 }
 
+// ================= Package & Service APIs =================
+async function GetPackages() {
+  try {
+    return await axios.get(`${apiUrl}/api/packages`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetServices() {
+  try {
+    console.log('GetServices - calling API:', `${apiUrl}/api/services`);
+    const response = await axios.get(`${apiUrl}/api/services`, authConfig());
+    console.log('GetServices - response:', response);
+    return response;
+  } catch (e: any) {
+    console.log('GetServices - error:', e);
+    return e.response;
+  }
+}
+
+async function GetUserPackageStatus(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/package-members/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreatePackageMember(data: { user_id: number; package_id: number }) {
+  try {
+    return await axios.post(`${apiUrl}/api/package-members`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteUserPackage(userId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/package-members/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateUserPackage(userId: number, packageId: number) {
+  try {
+    return await axios.put(`${apiUrl}/api/package-members/user/${userId}`, { package_id: packageId }, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
 // ================= Exports =================
 export {
   // Users
@@ -342,6 +471,16 @@ export {
   BookTrainerSchedule,
   CancelTrainBooking,
   GetBookingsByUserId,
+  GetCustomersByTrainerID,
+  GetCustomerBookedTimes,
+
+  // Personal Training
+  GetPersonalTrainingProgramsByCustomerID,
+  GetPersonalTrainingProgramsByTrainerID,
+  CreatePersonalTrainingProgram,
+  UpdatePersonalTrainingProgram,
+  DeletePersonalTrainingProgram,
+  GetPersonalTrainingProgramById,
 
   // Class Booking
   BookClass,
@@ -352,6 +491,15 @@ export {
   // Nutrition
   GetNutrition,
   UpsertNutrition,
+  GetNutritionByUserID,
+
+  // Package & Services
+  GetPackages,
+  GetServices,
+  GetUserPackageStatus,
+  CreatePackageMember,
+  DeleteUserPackage,
+  UpdateUserPackage,
 
   // Uploads
   UploadImage,
