@@ -1,0 +1,97 @@
+.form-container {
+    background-color: #fff;
+    max-width: 400px;
+    margin: 40px auto; /* กึ่งกลางแนวนอน มี margin บนล่าง */
+    padding: 24px 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .form-container h3 {
+    margin-bottom: 16px;
+    color: #d32f2f;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.6rem;
+  }
+  
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .form-field label {
+    font-weight: 600;
+    color: #444;
+    font-size: 1rem;
+  }
+  
+  .form-field input[type="text"],
+  .form-field input[type="number"] {
+    padding: 8px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-field input[type="text"]:focus,
+  .form-field input[type="number"]:focus {
+    border-color: #d32f2f;
+    outline: none;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+  
+  .form-actions button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .form-actions button:first-child {
+    background-color: #ccc;
+    color: #333;
+  }
+  
+  .form-actions button:first-child:hover {
+    background-color: #b3b3b3;
+  }
+  
+  .submit-button {
+    background-color: #d32f2f;
+    color: white;
+  }
+  
+  .submit-button:hover {
+    background-color: #a02727;
+  }
+  
+  .form-field input[type="date"] {
+    font-family: inherit; /* ใช้ font เดียวกับ input อื่นๆ */
+    font-size: 1rem;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer; /* ทำให้รู้ว่าคลิกได้ */
+  }
+  
+  /* ทำให้ปฏิทินที่แสดงขึ้นมาดูดีขึ้น (สำหรับเบราว์เซอร์ที่รองรับ) */
+  .form-field input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }

@@ -1,0 +1,269 @@
+.group-details-container {
+    background-color: #fff;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 24px 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  
+  .group-details-container h3 {
+    color: #d32f2f;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  
+  .group-details-container p {
+    font-size: 1rem;
+    margin: 8px 0;
+  }
+  
+  .group-details-container p b {
+    color: #d32f2f;
+  }
+  
+  .group-details-container h4 {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #d32f2f;
+    padding-bottom: 4px;
+    color: #d32f2f;
+  }
+  
+  .members-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+  }
+  
+  .members-table th,
+  .members-table td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  
+  .members-table th {
+    background-color: #f5f5f5;
+    color: #d32f2f;
+    font-weight: 600;
+  }
+  
+  .members-table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .details-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+  }
+  
+  .details-actions button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 120px !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    border: none !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  .back-button {
+    background-color: #d32f2f !important;
+    color: white !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    border: none !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  .back-button:hover {
+    background-color: #a02727 !important;
+  }
+  
+  .leave-button {
+    background-color: #d32f2f !important;
+    color: white !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    border: none !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  .leave-button:hover {
+    background-color: #a02727 !important;
+  }
+  
+  /* เพิ่มในไฟล์ GroupDetails.css */
+  
+  .details-info-box {
+    background-color: #f9f9f9;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-top: 16px;
+    border: 1px solid #eee;
+  }
+  
+  .status-badge {
+    margin-left: 8px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: white;
+  }
+  
+  .status-badge.status-open {
+    background-color: #28a745; /* สีเขียว */
+  }
+  
+  .status-badge.status-closed {
+    background-color: #dc3545; /* สีแดง */
+  }
+  
+  /* src/components/GroupList.css */
+  
+  /* สไตล์สำหรับปุ่ม "ดูรายละเอียด" */
+  .view-details-button {
+    background-color: #007bff; /* เช่น สีน้ำเงิน */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    width: 100%; /* ให้เต็มความกว้าง */
+  }
+  
+  .view-details-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* สไตล์สำหรับปุ่ม "เข้าร่วม" เดิม (ถ้าต้องการให้แตกต่าง) */
+  .join-button {
+    background-color: #e53935; /* สีแดงเดิม */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    width: 100%; /* ให้เต็มความกว้าง */
+  }
+  
+  .join-button:hover {
+    background-color: #c62828;
+  }
+  
+  /* ตรวจสอบว่า .create-group-btn มีสไตล์เหมาะสม */
+  .create-group-btn {
+    display: block; /* ทำให้ปุ่มอยู่บรรทัดใหม่ */
+    margin: 20px auto; /* จัดให้อยู่กลาง */
+    padding: 10px 20px;
+    background-color: #e53935;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: 200px; /* กำหนดความกว้างขั้นต่ำ */
+  }
+  
+  .create-group-btn:hover {
+    background-color: #c62828;
+  }
+  
+  /* สไตล์สำหรับข้อความไม่พบกลุ่ม */
+  .no-groups-message {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin-top: 30px;
+    font-size: 1.1rem;
+  }
+  
+  /* จัดกลุ่ม cards */
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* ปรับตามขนาดหน้าจอ */
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .group-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .group-card h4 {
+    color: #e53935;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .group-card p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+
+  /* สไตล์สำหรับข้อความยืนยันการเข้าร่วมกลุ่ม */
+  .success-message {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .success-icon {
+    background-color: #28a745;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

@@ -20,6 +20,9 @@ func ClassRoutes(api *gin.RouterGroup) {
 	api.DELETE("/class-bookings/:id", classbooking.Cancel)
 	api.GET("/class-bookings/user/:user_id/class/:class_id", classbooking.GetUserClassBooking)
 	api.GET("/class-bookings/user/:user_id", classbooking.GetUserBookings)
+
+	// --- Class Routes review ---
+	api.GET("/classes/:id/reviews", classactivity.GetClassReviews)
 }
 
 // PublicRoutes สำหรับ routes ที่ไม่ต้องใช้ authentication

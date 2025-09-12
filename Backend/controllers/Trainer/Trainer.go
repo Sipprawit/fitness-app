@@ -3,11 +3,11 @@ package Trainer
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 	"strings"
-	"os"
+	"time"
 
 	"example.com/fitness-backend/entity"
 	"example.com/fitness-backend/services"
@@ -93,20 +93,26 @@ func DeleteTrainer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Trainer deleted successfully"})
 }
 
-
 func UploadFile(c *gin.Context) {
 	// รับไฟล์จาก form-data โดยใช้ key ว่า "file"
 	// ✅ แก้ไขให้ key เป็น "file" เพื่อให้ตรงกับโค้ดใน Frontend
-	file, err := c.FormFile("file") 
+	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "กรุณาเลือกไฟล์"})
+		return
+	}
+
+	// ดึง trainer ID จาก URL parameter
+	trainerID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid trainer ID"})
 		return
 	}
 
 	// สร้างชื่อไฟล์ใหม่ ป้องกันชื่อซ้ำ
 	filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(file.Filename))
 	dirPath := filepath.Join("uploads", "trainers")
-	savePath := filepath.Join(dirPath, filename) 
+	savePath := filepath.Join(dirPath, filename)
 
 	// สร้างโฟลเดอร์ถ้ายังไม่มี
 	if err := os.MkdirAll(dirPath, 0755); err != nil {
@@ -120,11 +126,19 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// ส่ง URL ของไฟล์กลับไปให้ Frontend
+	// สร้าง URL ของไฟล์
 	fileURL := fmt.Sprintf("/uploads/trainers/%s", filename)
 
+	// อัปเดต ProfileImage ในฐานข้อมูล
+	updatedTrainer, err := services.UpdateTrainerImage(uint(trainerID), fileURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถอัปเดตข้อมูลเทรนเนอร์ได้"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "อัปโหลดไฟล์สำเร็จ",
-		"url":     fileURL, // ✅ ส่ง URL กลับไป
+		"message": "อัปโหลดไฟล์และอัปเดตข้อมูลสำเร็จ",
+		"url":     fileURL,
+		"trainer": updatedTrainer,
 	})
 }
