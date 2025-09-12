@@ -1,0 +1,321 @@
+/* src/pages/admin/EquipmentFacility/EquipmentFacility.css */
+
+/* --- General Layout --- */
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+
+.content-section {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.header-with-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header-with-button h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.add-button-main {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    border-radius: 50%;
+    background-color: #d90505;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+}
+
+.add-button-main:hover {
+    background-color: #a30404;
+}
+
+/* --- Toggle Buttons (Equipment/Facility) --- */
+.view-toggle {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+.view-toggle button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    color: #555;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.view-toggle button:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.view-toggle button:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.view-toggle button.active {
+    background-color: #d90505;
+    color: white;
+    border-color: #d90505;
+}
+
+.view-toggle button:hover:not(.active) {
+    background-color: #e0e0e0;
+}
+
+/* --- Table Styles --- */
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    min-width: 1100px;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    white-space: nowrap;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+    background-color: #d90505;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.status, .condition {
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status.available {
+    background-color: #28a745;
+}
+
+.status.maintenance {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status.broken {
+    background-color: #dc3545;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.icon-button:hover {
+    transform: scale(1.1);
+}
+
+.icon-button.edit-button {
+    color: #1a73e8;
+}
+
+.icon-button.delete-button {
+    color: #dc3545;
+}
+
+/* ให้คอลัมน์ปุ่มทำงานจัดแนวกลาง เหมือนกันทั้งสองตาราง */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* --- Form Styles (Add/Edit) --- */
+.form-title {
+    font-size: 24px;
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.form-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 30px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field-full {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field label, .form-field-full label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-field label.required::after, .form-field-full label.required::after {
+    content: '*';
+    color: #d90505;
+    margin-left: 4px;
+}
+
+.form-grid-container input,
+.form-grid-container select,
+.form-grid-container textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-grid-container input:focus,
+.form-grid-container select:focus,
+.form-grid-container textarea:focus {
+    outline: none;
+    border-color: #d90505;
+    box-shadow: 0 0 0 2px rgba(217, 5, 5, 0.2);
+}
+
+.form-actions-bottom {
+    grid-column: span 2;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.back-button, .save-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    min-width: 180px; /* ให้ปุ่มทั้งสองมีขนาดเท่ากัน */
+    text-align: center;
+}
+
+.back-button {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.back-button:hover {
+    background-color: #c7c7c7;
+}
+
+.save-button {
+    background-color: #d90505;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #b30404;
+}
+
+.delete-confirm-container {
+    padding: 30px;
+    text-align: center;
+}
+
+.delete-title {
+    font-size: 28px;
+    color: #d90505;
+    margin-bottom: 10px;
+}
+
+.delete-message {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.delete-button-confirm {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #d90505;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.delete-button-confirm:hover {
+    background-color: #a30404;
+}
+
+.status.good, .condition.good {
+    background-color: #28a745; /* Green */
+}
+
+.status.needs-repair, .condition.needs-repair {
+    background-color: #ffc107; /* Yellow */
+    color: #212529;
+}
+
+.status.needs-replacement, .condition.needs-replacement {
+    background-color: #dc3545; /* Red */
+    color: white;
+}

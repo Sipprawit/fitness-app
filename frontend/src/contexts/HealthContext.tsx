@@ -4,6 +4,7 @@ import type { HealthData } from "../interface/HealthData";
 import type { Activity } from "../interface/Activity";
 import type { NutritionData } from "../interface/Nutrition";
 import { useNotification } from "../components/Notification/NotificationProvider";
+import { GetHealth, GetActivities, UpdateActivity, DeleteActivity, GetNutrition } from "../services/https";
 
 interface HealthActivityContextType {
   health: HealthData | null;
@@ -42,27 +43,15 @@ export const HealthActivityProvider = ({ children }: { children: ReactNode }) =>
   const { showNotification } = useNotification();
 
   const fetchData = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
       const [healthRes, activityRes, nutritionRes] = await Promise.all([
-        fetch("http://localhost:8000/api/health", {
-          method: "GET",
-          headers: { "Authorization": `Bearer ${token}` },
-        }),
-        fetch("http://localhost:8000/api/activity", {
-          method: "GET",
-          headers: { "Authorization": `Bearer ${token}` },
-        }),
-        fetch("http://localhost:8000/api/nutrition", {
-          method: "GET",
-          headers: { "Authorization": `Bearer ${token}` },
-        }),
+        GetHealth(),
+        GetActivities(),
+        GetNutrition(),
       ]);
 
-      if (healthRes.ok) {
-        const result = await healthRes.json();
+      if (healthRes?.status === 200) {
+        const result = healthRes.data;
         // รองรับทั้งรูปแบบที่เป็น array ตรง ๆ และแบบที่ห่อ data
         const rawHealthList = Array.isArray(result)
           ? result
@@ -104,8 +93,8 @@ export const HealthActivityProvider = ({ children }: { children: ReactNode }) =>
         console.log("Health API response not ok:", healthRes.status, healthRes.statusText);
       }
 
-      if (activityRes.ok) {
-        const result = await activityRes.json();
+      if (activityRes?.status === 200) {
+        const result = activityRes.data;
         // รองรับทั้ง array ตรง ๆ และแบบที่ห่อ data
         const list = Array.isArray(result) ? result : result?.data ?? [];
         
@@ -126,8 +115,8 @@ export const HealthActivityProvider = ({ children }: { children: ReactNode }) =>
         console.log("Activity API response not ok:", activityRes.status, activityRes.statusText);
       }
 
-      if (nutritionRes.ok) {
-        const result = await nutritionRes.json();
+      if (nutritionRes?.status === 200) {
+        const result = nutritionRes.data;
         // รองรับทั้ง array ตรง ๆ และแบบที่ห่อ data
         const nutritionData = Array.isArray(result) ? result[0] : result?.data ?? result;
         setNutrition(nutritionData);
@@ -162,21 +151,11 @@ export const HealthActivityProvider = ({ children }: { children: ReactNode }) =>
   };
   
   const updateActivity = async (id: number, updatedActivity: Partial<Activity>) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
-      const response = await fetch(`http://localhost:8000/api/activity/${id}`, {
-        method: "PUT",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updatedActivity),
-      });
+      const response = await UpdateActivity(id, updatedActivity);
 
-      if (response.ok) {
-        const updatedActivityData = await response.json();
+      if (response?.status === 200) {
+        const updatedActivityData = response.data;
         // แปลง ID เป็น id สำหรับ frontend
         const processedActivity = {
           ...updatedActivityData,
@@ -221,16 +200,10 @@ export const HealthActivityProvider = ({ children }: { children: ReactNode }) =>
   };
   
   const deleteActivity = async (id: number) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
-      const response = await fetch(`http://localhost:8000/api/activity/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` },
-      });
+      const response = await DeleteActivity(id);
 
-      if (response.ok) {
+      if (response?.status === 200) {
         // อัปเดต state หลังจากลบสำเร็จ
         setActivities((prev) => prev.filter(activity => {
           const activityId = activity.id || (activity as any).ID;

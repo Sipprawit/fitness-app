@@ -1,13 +1,14 @@
 // src/pages/Auth/SignInPages.tsx
-import { Button, Card, Form, Input, message, Flex, Row, Col } from "antd";
+import { Button, Card, Form, Input, Flex, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 import { SignIn } from "../../../services/https";
 import type { SignInInterface } from "../../../interface/SignIn";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 import logo from "../../../assets/gymmy1.png";
 
 function SignInPages() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
 
   const onFinish = async (values: SignInInterface) => {
     // ส่งข้อมูล email และ password ไปยัง Backend API
@@ -18,11 +19,21 @@ function SignInPages() {
       const actor = res.data.actor; // สมมติว่า Backend ส่ง field 'actor' กลับมาใน response
       
       if (!actor) {
-        messageApi.error("ไม่พบบทบาทผู้ใช้งาน, กรุณาติดต่อผู้ดูแลระบบ");
+        showNotification({
+          type: 'error',
+          title: 'ไม่พบบทบาทผู้ใช้งาน',
+          message: 'กรุณาติดต่อผู้ดูแลระบบ',
+          duration: 3000
+        });
         return;
       }
       
-      messageApi.success("เข้าสู่ระบบสำเร็จ");
+      showNotification({
+        type: 'success',
+        title: 'เข้าสู่ระบบสำเร็จ',
+        message: 'เข้าสู่ระบบเรียบร้อยแล้ว',
+        duration: 2000
+      });
       localStorage.setItem("isLogin", "true");
       localStorage.setItem("page", "dashboard");
       localStorage.setItem("token_type", res.data.token_type);
@@ -42,13 +53,17 @@ function SignInPages() {
         navigate(redirectPath);
       }, 2000);
     } else {
-      messageApi.error(res.data.error);
+      showNotification({
+        type: 'error',
+        title: 'เข้าสู่ระบบไม่สำเร็จ',
+        message: res.data.error || 'เกิดข้อผิดพลาด',
+        duration: 3000
+      });
     }
   };
 
   return (
     <>
-      {contextHolder}
       <Flex justify="center" align="center" className="login">
         <Card className="card-login" style={{ width: 500 }}>
           <Row justify="center" align="middle" style={{ height: "400px" }}>

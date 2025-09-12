@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useHealthActivity } from "../../../contexts/HealthContext";
 import { useNotification } from "../../../components/Notification/NotificationProvider";
+import { CreateActivity } from "../../../services/https";
 
 interface Props {
   activitiesList: { name: string; met: number }[];
@@ -22,7 +23,6 @@ function ActivityForm({ activitiesList }: Props) {
   const [duration, setDuration] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  const token = localStorage.getItem("token");
   
   // กิจกรรมที่ต้องใช้ระยะทาง
   const activitiesWithDistance = ["วิ่ง", "เดิน", "ปั่นจักรยาน", "ว่ายน้ำ", "เดินเร็ว", "เดินช้า"];
@@ -98,20 +98,12 @@ function ActivityForm({ activitiesList }: Props) {
     console.log("=== End Activity Data ===");
 
     try {
-      const res = await fetch("http://localhost:8000/api/activity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(activityData),
-      });
+      const res = await CreateActivity(activityData);
 
-      if (!res.ok) {
-        const err = await res.json();
+      if (res?.status !== 200) {
+        const err = res?.data || { error: "Unknown error" };
         console.log("=== Activity API Error ===");
-        console.log("Response status:", res.status);
-        console.log("Response statusText:", res.statusText);
+        console.log("Response status:", res?.status);
         console.log("Error response:", err);
         console.log("=== End Activity API Error ===");
         showNotification({
@@ -123,7 +115,7 @@ function ActivityForm({ activitiesList }: Props) {
         return;
       }
 
-      const result = await res.json();
+      const result = res.data;
       console.log("=== Activity API Success ===");
       console.log("Response:", result);
       console.log("=== End Activity API Success ===");

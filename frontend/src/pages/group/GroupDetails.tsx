@@ -1,7 +1,7 @@
 // src/components/GroupDetails.tsx
 
 import React from 'react';
-import type { WorkoutGroup } from './groupSystem';
+import type { WorkoutGroup } from './GroupSystem';
 import './GroupDetails.css'; // สร้างไฟล์นี้ถ้ายังไม่มี
 
 interface GroupDetailsProps {
@@ -12,17 +12,12 @@ interface GroupDetailsProps {
   joinSuccessMessage?: string;
 }
 
-const GroupDetails: React.FC<GroupDetailsProps> = ({ group, onBack, onLeave, currentUserId, joinSuccessMessage }) => {
+const GroupDetails: React.FC<GroupDetailsProps> = ({ group, onBack, onLeave, currentUserId, }) => {
   const isMember = group.members.some(m => m.userId === currentUserId);
   return (
     <div className="group-details-card">
-      {/* === แสดงข้อความยืนยันการเข้าร่วมกลุ่ม === */}
-      {joinSuccessMessage && (
-        <div className="success-message">
-          <div className="success-icon">✓</div>
-          <span>{joinSuccessMessage}</span>
-        </div>
-      )}
+
+
       
       {/* === ส่วนหัว === */}
       <div className="details-header">

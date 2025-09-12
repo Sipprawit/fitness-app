@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Col, Divider, Row, Table, message, Statistic, Button, Popconfirm } from "antd";
+import { Card, Col, Divider, Row, Table, Statistic, Button, Popconfirm } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { GetTrainerSchedulesByTrainer, DeleteTrainerScheduleById } from "../../../services/https";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 
 interface ScheduleInterface {
   ID: number;
@@ -22,7 +23,7 @@ interface ScheduleInterface {
 
 function HomeTrainer() {
   const [schedules, setSchedules] = useState<ScheduleInterface[]>([]);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
 
   const columns: ColumnsType<ScheduleInterface> = [
@@ -114,7 +115,12 @@ function HomeTrainer() {
       const trainerId = trainerIdStr ? Number(trainerIdStr) : NaN;
       if (!trainerId || Number.isNaN(trainerId)) {
         setSchedules([]);
-        messageApi.open({ type: "error", content: "ไม่พบรหัสเทรนเนอร์ที่กำลังล็อกอิน" });
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "ไม่พบรหัสเทรนเนอร์ที่กำลังล็อกอิน",
+          duration: 3000
+        });
         return;
       }
 
@@ -123,10 +129,20 @@ function HomeTrainer() {
         setSchedules(res.data as ScheduleInterface[]);
       } else {
         setSchedules([]);
-        messageApi.open({ type: "error", content: res.data?.error || "ไม่สามารถดึงข้อมูลได้" });
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: res.data?.error || "ไม่สามารถดึงข้อมูลได้",
+          duration: 3000
+        });
       }
     } catch (err: any) {
-      messageApi.open({ type: "error", content: err?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: err?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล",
+        duration: 3000
+      });
     }
   };
 
@@ -134,13 +150,28 @@ function HomeTrainer() {
     try {
       const res = await DeleteTrainerScheduleById(scheduleId);
       if (res.status === 200) {
-        messageApi.open({ type: "success", content: "ลบตารางเวลาสำเร็จ" });
+        showNotification({
+          type: "success",
+          title: "สำเร็จ",
+          message: "ลบตารางเวลาสำเร็จ",
+          duration: 3000
+        });
         fetchAllSchedules(); // รีเฟรชข้อมูล
       } else {
-        messageApi.open({ type: "error", content: res.data?.error || "ไม่สามารถลบตารางเวลาได้" });
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: res.data?.error || "ไม่สามารถลบตารางเวลาได้",
+          duration: 3000
+        });
       }
     } catch (err: any) {
-      messageApi.open({ type: "error", content: err?.message || "เกิดข้อผิดพลาดในการลบตารางเวลา" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: err?.message || "เกิดข้อผิดพลาดในการลบตารางเวลา",
+        duration: 3000
+      });
     }
   };
 
@@ -150,7 +181,6 @@ function HomeTrainer() {
 
   return (
     <div className="p-4 text-white">
-      {contextHolder}
       <h1 className="text-2xl font-bold">Trainer Dashboard</h1>
       <p>ภาพรวมตารางเทรนและการจอง</p>
 
@@ -184,7 +214,12 @@ function HomeTrainer() {
                 console.log("TrainerHome - Navigating to:", url);
                 navigate(url);
               } else {
-                messageApi.open({ type: "error", content: "ไม่พบรหัสเทรนเนอร์ที่กำลังล็อกอิน" });
+                showNotification({
+                  type: "error",
+                  title: "เกิดข้อผิดพลาด",
+                  message: "ไม่พบรหัสเทรนเนอร์ที่กำลังล็อกอิน",
+                  duration: 3000
+                });
               }
             }}
             style={{ backgroundColor: '#e50000', borderColor: '#e50000', color: 'white' }}

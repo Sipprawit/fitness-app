@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import StarRating from './../review/StarRating';
 import type { TrainingItem } from './ReviewSystem'; // ใช้ Type จาก ReviewSystem
+
+import { useNotification } from '../../components/Notification/NotificationProvider';
 import './ReviewPage.css';
 
 interface ReviewPageProps {
@@ -13,9 +15,17 @@ const ReviewPage: React.FC<ReviewPageProps> = ({ item, onSubmit, onBack }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
 
+  const { showNotification } = useNotification();
+
   const handleSubmit = () => {
     if (rating === 0) {
-      alert('กรุณาให้คะแนนอย่างน้อย 1 ดาว');
+      showNotification({
+        type: 'warning',
+        title: 'กรุณาให้คะแนน',
+        message: 'กรุณาให้คะแนนอย่างน้อย 1 ดาว',
+        duration: 2000
+      });
+
       return;
     }
     onSubmit(item.ID, { rating, comment });

@@ -1,7 +1,10 @@
 // src/components/GroupList.tsx
 import './GroupList.css';
 import React from 'react';
-import type { WorkoutGroup } from './groupSystem';
+import type { WorkoutGroup } from './GroupSystem';
+
+import { useNotification } from '../../components/Notification/NotificationProvider';
+
 
 interface GroupListProps {
   groups: WorkoutGroup[];
@@ -12,6 +15,9 @@ interface GroupListProps {
 }
 
 const GroupList: React.FC<GroupListProps> = ({ groups, onCreate, onView, onJoin, currentUserId }) => {
+
+  const { showNotification } = useNotification();
+
   return (
     <div className="group-list-container">
       {/* === จุดที่แก้ไข: ลบ filter-bar ทั้งหมดออกไป === */}
@@ -36,7 +42,14 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onCreate, onView, onJoin,
                       className="join-button"
                       onClick={() => {
                         if (group.members.length >= group.maxMembers) {
-                          alert('กลุ่มเต็มแล้ว');
+
+                          showNotification({
+                            type: 'warning',
+                            title: 'กลุ่มเต็มแล้ว',
+                            message: 'ไม่สามารถเข้าร่วมกลุ่มได้ เนื่องจากกลุ่มเต็มแล้ว',
+                            duration: 2000
+                          });
+
                           return;
                         }
                         onJoin(group.id);

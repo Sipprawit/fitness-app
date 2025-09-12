@@ -1,7 +1,9 @@
 // src/pages/classbooking/ClassDetailPage.tsx
 import React, { useState, useEffect } from 'react';
-import { Modal, message } from 'antd';
+import { Modal } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useNotification } from '../../components/Notification/NotificationProvider';
+import dayjs from 'dayjs';
 import type { ClassActivity } from '../../types';
 import { getClassById } from '../../services/apiService';
 import { BookClass, GetUserClassBooking, CancelClassBooking } from '../../services/https';
@@ -16,6 +18,17 @@ const ClassDetailPage: React.FC = () => {
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [userBooking, setUserBooking] = useState<any>(null);
     const [isBooked, setIsBooked] = useState<boolean>(false);
+    const { showNotification } = useNotification();
+
+    // ฟังก์ชันตรวจสอบว่าเลยเวลาไปแล้วหรือไม่
+    const isClassTimePassed = (classData: ClassActivity | null): boolean => {
+        if (!classData) return false;
+        
+        const classDateTime = dayjs(`${classData.date} ${classData.startTime}`, 'YYYY-MM-DD HH:mm');
+        const now = dayjs();
+        
+        return now.isAfter(classDateTime);
+    };
 
     useEffect(() => {
         const fetchClassData = async () => {
@@ -75,7 +88,12 @@ const ClassDetailPage: React.FC = () => {
         try {
             const res = await BookClass(parseInt(id, 10), parseInt(userIdStr, 10));
             if (res?.status === 200 || res?.status === 201) {
-                message.success('จองคลาสสำเร็จ');
+                showNotification({
+                    type: 'success',
+                    title: 'จองคลาสสำเร็จ',
+                    message: 'จองคลาสเรียบร้อยแล้ว',
+                    duration: 2000
+                });
                 const data = await getClassById(parseInt(id, 10));
                 setClassData(data);
                 // อัปเดตสถานะการจอง
@@ -96,7 +114,12 @@ const ClassDetailPage: React.FC = () => {
         try {
             const res = await CancelClassBooking(userBooking.ID);
             if (res?.status === 200) {
-                message.success('ยกเลิกการจองสำเร็จ');
+                showNotification({
+                    type: 'success',
+                    title: 'ยกเลิกการจองสำเร็จ',
+                    message: 'ยกเลิกการจองคลาสเรียบร้อยแล้ว',
+                    duration: 2000
+                });
                 const data = await getClassById(parseInt(id!, 10));
                 setClassData(data);
                 // อัปเดตสถานะการจอง
@@ -139,19 +162,49 @@ const ClassDetailPage: React.FC = () => {
                         <div className="form-actions-bottom">
                             <button onClick={handleGoBack} className="back-button-gray">ย้อนกลับ</button>
                             {isBooked ? (
-                                <button 
-                                    onClick={handleCancelBooking}
-                                    className="book-button"
-                                >
-                                    ยกเลิกการจอง
-                                </button>
+                                isClassTimePassed(classData) ? (
+                                    <button 
+                                        disabled
+                                        className="book-button"
+                                        style={{ 
+                                            backgroundColor: '#ccc', 
+                                            cursor: 'not-allowed',
+                                            opacity: 0.6 
+                                        }}
+                                        title="ไม่สามารถยกเลิกได้เนื่องจากเลยเวลาไปแล้ว"
+                                    >
+                                        ไม่สามารถยกเลิกได้
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={handleCancelBooking}
+                                        className="book-button"
+                                    >
+                                        ยกเลิกการจอง
+                                    </button>
+                                )
                             ) : (
-                                <button 
-                                    onClick={handleBookClass}
-                                    className="book-button"
-                                >
-                                    จองคลาส
-                                </button>
+                                isClassTimePassed(classData) ? (
+                                    <button 
+                                        disabled
+                                        className="book-button"
+                                        style={{ 
+                                            backgroundColor: '#ccc', 
+                                            cursor: 'not-allowed',
+                                            opacity: 0.6 
+                                        }}
+                                        title="ไม่สามารถจองได้เนื่องจากเลยเวลาไปแล้ว"
+                                    >
+                                        ไม่สามารถจองได้
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={handleBookClass}
+                                        className="book-button"
+                                    >
+                                        จองคลาส
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

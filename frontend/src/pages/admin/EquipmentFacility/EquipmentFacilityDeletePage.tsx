@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteEquipment, deleteFacility, getEquipmentById, getFacilityById } from '../../../services/apiService';
+import { useNotification } from '../../../components/Notification/NotificationProvider';
 import './EquipmentFacility.css';
 
 interface EquipmentFacilityDeleteProps {
@@ -13,6 +14,7 @@ const EquipmentFacilityDeletePage: React.FC<EquipmentFacilityDeleteProps> = ({ i
     const { id } = useParams<{ id: string }>();
     const [itemName, setItemName] = useState('รายการนี้'); // เพิ่ม state สำหรับเก็บชื่อ
     const [loading, setLoading] = useState(true);
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const fetchItemName = async () => {
@@ -48,15 +50,30 @@ const EquipmentFacilityDeletePage: React.FC<EquipmentFacilityDeleteProps> = ({ i
                 } else {
                     await deleteFacility(numericId);
                 }
-                // แก้ไขการนำทางให้กลับไปที่หน้าเดิม
-                if (itemType === 'equipment') {
-                    navigate('/admin/equipment');
-                } else {
-                    navigate('/admin/equipment?view=facility');
-                }
+                
+                showNotification({
+                    type: 'success',
+                    title: `ลบ${itemType === 'equipment' ? 'อุปกรณ์' : 'สิ่งอำนวยความสะดวก'}สำเร็จ`,
+                    message: `ลบข้อมูล${itemName} เรียบร้อยแล้ว`,
+                    duration: 2000
+                });
+                
+                setTimeout(() => {
+                    // แก้ไขการนำทางให้กลับไปที่หน้าเดิม
+                    if (itemType === 'equipment') {
+                        navigate('/admin/equipment');
+                    } else {
+                        navigate('/admin/equipment?view=facility');
+                    }
+                }, 1000);
             } catch (error) {
                 console.error(`Failed to delete ${itemType} with ID: ${id}`, error);
-                alert("ไม่สามารถลบข้อมูลได้");
+                showNotification({
+                    type: 'error',
+                    title: 'ไม่สามารถลบข้อมูลได้',
+                    message: `เกิดข้อผิดพลาดในการลบข้อมูล${itemType === 'equipment' ? 'อุปกรณ์' : 'สิ่งอำนวยความสะดวก'}`,
+                    duration: 3000
+                });
             }
         }
     };

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GetUsersById, DeleteUsersById } from '../../../services/https';
 import type { UsersInterface } from '../../../interface/IUser';
+import { useNotification } from '../../../components/Notification/NotificationProvider';
 import './userlist.css';
 
 const UserDeletePage: React.FC = () => {
@@ -10,6 +11,7 @@ const UserDeletePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<UsersInterface | null>(null);
     const [loading, setLoading] = useState(true);
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -36,13 +38,31 @@ const UserDeletePage: React.FC = () => {
         try {
             const res = await DeleteUsersById(id);
             if (res.status === 200) {
-                navigate('/admin/List');
+                showNotification({
+                    type: 'success',
+                    title: 'ลบสมาชิกสำเร็จ',
+                    message: 'ลบข้อมูลสมาชิกเรียบร้อยแล้ว',
+                    duration: 2000
+                });
+                setTimeout(() => {
+                    navigate('/admin/List');
+                }, 1000);
             } else {
-                alert('ไม่สามารถลบข้อมูลได้');
+                showNotification({
+                    type: 'error',
+                    title: 'ไม่สามารถลบข้อมูลได้',
+                    message: 'เกิดข้อผิดพลาดในการลบข้อมูลสมาชิก',
+                    duration: 3000
+                });
             }
         } catch (error) {
             console.error('Failed to delete user:', error);
-            alert('ไม่สามารถลบข้อมูลได้');
+            showNotification({
+                type: 'error',
+                title: 'ไม่สามารถลบข้อมูลได้',
+                message: 'เกิดข้อผิดพลาดในการลบข้อมูลสมาชิก',
+                duration: 3000
+            });
         }
     };
     

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GetTrainerById, DeleteTrainerById } from '../../../services/https';
 import type { TrainerInterface } from '../../../interface/ITrainer';
+import { useNotification } from '../../../components/Notification/NotificationProvider';
 import './userlist.css';
 
 const TrainerDeletePage: React.FC = () => {
@@ -10,6 +11,7 @@ const TrainerDeletePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [trainer, setTrainer] = useState<TrainerInterface | null>(null);
     const [loading, setLoading] = useState(true);
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const fetchTrainer = async () => {
@@ -36,13 +38,31 @@ const TrainerDeletePage: React.FC = () => {
         try {
             const res = await DeleteTrainerById(parseInt(id, 10));
             if (res.status === 200) {
-                navigate('/admin/List?view=trainers');
+                showNotification({
+                    type: 'success',
+                    title: 'ลบเทรนเนอร์สำเร็จ',
+                    message: 'ลบข้อมูลเทรนเนอร์เรียบร้อยแล้ว',
+                    duration: 2000
+                });
+                setTimeout(() => {
+                    navigate('/admin/List?view=trainers');
+                }, 1000);
             } else {
-                alert('ไม่สามารถลบข้อมูลได้');
+                showNotification({
+                    type: 'error',
+                    title: 'ไม่สามารถลบข้อมูลได้',
+                    message: 'เกิดข้อผิดพลาดในการลบข้อมูลเทรนเนอร์',
+                    duration: 3000
+                });
             }
         } catch (error) {
             console.error('Failed to delete trainer:', error);
-            alert('ไม่สามารถลบข้อมูลได้');
+            showNotification({
+                type: 'error',
+                title: 'ไม่สามารถลบข้อมูลได้',
+                message: 'เกิดข้อผิดพลาดในการลบข้อมูลเทรนเนอร์',
+                duration: 3000
+            });
         }
     };
     

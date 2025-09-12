@@ -81,6 +81,13 @@ func main() {
 		routes.GroupRoutes(api)
 
 		routes.ReviewRoutes(api)
+
+		routes.PackageRoutes(api)
+
+		routes.PackagememberRoutes(api)
+
+		routes.ServicesRoutes(api)
+
 	}
 
 	r.GET("/", func(c *gin.Context) {

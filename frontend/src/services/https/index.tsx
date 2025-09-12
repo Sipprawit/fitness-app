@@ -251,6 +251,74 @@ async function GetUserBookings(userId: number) {
   }
 }
 
+// Get user's booked classes with class details
+async function GetUserBookedClasses(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/class-bookings/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// Get user's booked trainers with trainer details
+async function GetUserBookedTrainers(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/train-bookings/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+
+// ================= Health APIs =================
+async function GetHealth() {
+  try {
+    return await axios.get(`${apiUrl}/api/health`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateHealth(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/health`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+// ================= Activity APIs =================
+async function GetActivities() {
+  try {
+    return await axios.get(`${apiUrl}/api/activity`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreateActivity(data: any) {
+  try {
+    return await axios.post(`${apiUrl}/api/activity`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateActivity(id: number, data: any) {
+  try {
+    return await axios.put(`${apiUrl}/api/activity/${id}`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteActivity(id: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/activity/${id}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
 
 // ================= Nutrition APIs =================
 async function GetNutrition(date?: string) {
@@ -370,6 +438,15 @@ async function DeleteReview(reviewId: number) {
   }
 }
 
+
+async function GetReviewsByItem(itemId: number, itemType: 'classes' | 'trainers') {
+  try {
+    return await axios.get(`${apiUrl}/api/reviews?reviewable_id=${itemId}&reviewable_type=${itemType}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
 export async function upsertNutrition(payload: NutritionData) {
   try {
     return await axios.post(`${apiUrl}/api/nutrition`, payload, authConfig());
@@ -400,6 +477,58 @@ async function UploadImage(file: File) {
       "Content-Type": "multipart/form-data",
     },
   });
+}
+
+async function GetPackages() {
+  try {
+    return await axios.get(`${apiUrl}/api/packages`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function GetServices() {
+  try {
+    console.log('GetServices - calling API:', `${apiUrl}/api/services`);
+    const response = await axios.get(`${apiUrl}/api/services`, authConfig());
+    console.log('GetServices - response:', response);
+    return response;
+  } catch (e: any) {
+    console.log('GetServices - error:', e);
+    return e.response;
+  }
+}
+
+async function GetUserPackageStatus(userId: number) {
+  try {
+    return await axios.get(`${apiUrl}/api/package-members/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function CreatePackageMember(data: { user_id: number; package_id: number }) {
+  try {
+    return await axios.post(`${apiUrl}/api/package-members`, data, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function DeleteUserPackage(userId: number) {
+  try {
+    return await axios.delete(`${apiUrl}/api/package-members/user/${userId}`, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
+}
+
+async function UpdateUserPackage(userId: number, packageId: number) {
+  try {
+    return await axios.put(`${apiUrl}/api/package-members/user/${userId}`, { package_id: packageId }, authConfig());
+  } catch (e: any) {
+    return e.response;
+  }
 }
 
 // ================= Exports =================
@@ -439,6 +568,8 @@ export {
   CancelClassBooking,
   GetUserClassBooking,
   GetUserBookings,
+  GetUserBookedClasses,
+  GetUserBookedTrainers,
 
   // Class Activities
   GetAllClasses,
@@ -456,10 +587,30 @@ export {
   CreateReview,
   UpdateReview,
   DeleteReview,
+  GetReviewsByItem,
+
+  // Health
+  GetHealth,
+  CreateHealth,
+
+  // Activities
+  GetActivities,
+  CreateActivity,
+  UpdateActivity,
+  DeleteActivity,
+
 
   // Nutrition
   GetNutrition,
   UpsertNutrition,
+
+  // Package & Services
+  GetPackages,
+  GetServices,
+  GetUserPackageStatus,
+  CreatePackageMember,
+  DeleteUserPackage,
+  UpdateUserPackage,
 
   // Uploads
   UploadImage,

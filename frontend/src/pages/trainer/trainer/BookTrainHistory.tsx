@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Spin, message } from "antd";
+import { Spin } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 import { GetBookingsByUserId, CancelTrainBooking } from "../../../services/https";
 import type { TrainBookingInterface } from "../../../interface/ITrainBooking";
 import dayjs from "dayjs";
@@ -13,6 +14,7 @@ const BookTrainHistory: React.FC = () => {
   const [bookings, setBookings] = useState<TrainBookingInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     fetchBookingHistory();
@@ -22,7 +24,12 @@ const BookTrainHistory: React.FC = () => {
     try {
       const userId = localStorage.getItem("id");
       if (!userId) {
-        message.error("ไม่พบรหัสผู้ใช้งาน");
+        showNotification({
+          type: 'error',
+          title: 'ไม่พบรหัสผู้ใช้งาน',
+          message: 'กรุณาเข้าสู่ระบบใหม่',
+          duration: 3000
+        });
         navigate("/login");
         return;
       }
@@ -33,7 +40,12 @@ const BookTrainHistory: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching booking history:", error);
-      message.error("เกิดข้อผิดพลาดในการดึงข้อมูลประวัติการจอง");
+      showNotification({
+        type: 'error',
+        title: 'ไม่สามารถดึงข้อมูลได้',
+        message: 'เกิดข้อผิดพลาดในการดึงข้อมูลประวัติการจอง',
+        duration: 3000
+      });
     } finally {
       setLoading(false);
     }
@@ -77,15 +89,30 @@ const BookTrainHistory: React.FC = () => {
       const response = await CancelTrainBooking(bookingId);
       
       if (response.status === 200) {
-        message.success("ยกเลิกการจองสำเร็จ");
+        showNotification({
+          type: 'success',
+          title: 'ยกเลิกการจองสำเร็จ',
+          message: 'ยกเลิกการจองเรียบร้อยแล้ว',
+          duration: 2000
+        });
         // Refresh the booking list
         fetchBookingHistory();
       } else {
-        message.error(response.data?.error || "ไม่สามารถยกเลิกการจองได้");
+        showNotification({
+          type: 'error',
+          title: 'ไม่สามารถยกเลิกการจองได้',
+          message: response.data?.error || 'เกิดข้อผิดพลาด',
+          duration: 3000
+        });
       }
     } catch (error) {
       console.error("Error cancelling booking:", error);
-      message.error("เกิดข้อผิดพลาดในการยกเลิกการจอง");
+      showNotification({
+        type: 'error',
+        title: 'ไม่สามารถยกเลิกการจองได้',
+        message: 'เกิดข้อผิดพลาดในการยกเลิกการจอง',
+        duration: 3000
+      });
     }
   };
 

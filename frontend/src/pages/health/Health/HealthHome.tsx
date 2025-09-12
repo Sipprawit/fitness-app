@@ -143,6 +143,7 @@ export default function HealthHome() {
 
   return (
     <div style={pageStyle}>
+      <div style={pageOverlayStyle}></div>
       <h1 style={titleStyle}>Healthy</h1>
 
       {/* Tab Navigation */}
@@ -287,7 +288,21 @@ const pageStyle: React.CSSProperties = {
   backgroundImage: "url('/gym.jpg')",
   backgroundSize: "cover",
   backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backdropFilter: "blur(8px)",
   minHeight: "100vh",
+  position: "relative",
+};
+
+const pageOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: "rgba(0, 0, 0, 0.4)",
+  backdropFilter: "blur(8px)",
+  zIndex: -1,
 };
 
 const titleStyle: React.CSSProperties = {

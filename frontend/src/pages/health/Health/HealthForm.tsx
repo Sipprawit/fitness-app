@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { HealthData } from "../../../interface/HealthData";
 import { useHealthActivity } from "../../../contexts/HealthContext";
 import { useNotification } from "../../../components/Notification/NotificationProvider";
+import { CreateHealth } from "../../../services/https";
 
 interface Props {
   activitiesList?: any[];
@@ -35,7 +36,6 @@ function HealthForm({ onSubmit, initialData, isEditing, onCancelEdit }: Props) {
     }
   }, [initialData]);
 
-  const token = localStorage.getItem("token");
 
   const handleSubmit = async () => {
     const weightNum = parseFloat(weight);
@@ -97,17 +97,10 @@ function HealthForm({ onSubmit, initialData, isEditing, onCancelEdit }: Props) {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/api/health", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSave),
-      });
+      const res = await CreateHealth(dataToSave);
 
-      if (!res.ok) {
-        const err = await res.json();
+      if (res?.status !== 200) {
+        const err = res?.data || { error: "Unknown error" };
         showNotification({
           type: 'error',
           title: 'เกิดข้อผิดพลาด',
@@ -117,7 +110,7 @@ function HealthForm({ onSubmit, initialData, isEditing, onCancelEdit }: Props) {
         return;
       }
 
-      const result = await res.json();
+      const result = res.data;
       console.log("Health save response:", result);
       console.log("Health data from response:", result.data);
       

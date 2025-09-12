@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -224,5 +225,56 @@ func UploadAvatar(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":    "Avatar uploaded successfully",
 		"avatar_url": avatarURL,
+	})
+}
+
+// DeleteAvatar - ลบรูปโปรไฟล์
+func DeleteAvatar(c *gin.Context) {
+	// ดึง user ID จาก JWT token
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - user_id not found in context"})
+		return
+	}
+
+	// Debug: แสดง user ID
+	fmt.Printf("DeleteAvatar - User ID: %v (type: %T)\n", userID, userID)
+
+	// แปลง userID เป็น uint
+	var userIDUint uint
+	switch v := userID.(type) {
+	case uint:
+		userIDUint = v
+	case float64:
+		userIDUint = uint(v)
+	case int:
+		userIDUint = uint(v)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	// หาข้อมูล user
+	var user entity.Users
+	db := config.DB()
+	result := db.First(&user, userIDUint)
+	if result.Error != nil {
+		fmt.Printf("DeleteAvatar - Database error: %v\n", result.Error)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Debug: แสดงข้อมูล user
+	fmt.Printf("DeleteAvatar - User found: ID=%d, Avatar=%s\n", user.ID, user.Avatar)
+
+	// ลบ avatar URL จากฐานข้อมูล
+	user.Avatar = ""
+	if err := db.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete avatar"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Avatar deleted successfully",
 	})
 }

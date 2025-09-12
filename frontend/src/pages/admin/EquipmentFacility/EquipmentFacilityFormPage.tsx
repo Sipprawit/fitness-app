@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Equipment, Facility } from '../../../types';
 import { getEquipmentById, createEquipment, updateEquipment, getFacilityById, createFacility, updateFacility } from '../../../services/apiService';
+import { useNotification } from '../../../components/Notification/NotificationProvider';
 import './EquipmentFacility.css';
 
 interface EquipmentFacilityFormProps {
@@ -13,6 +14,7 @@ const EquipmentFacilityFormPage: React.FC<EquipmentFacilityFormProps> = ({ itemT
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const isEditMode = Boolean(id);
+    const { showNotification } = useNotification();
     
     const [formData, setFormData] = useState<any>({});
 
@@ -72,17 +74,36 @@ const EquipmentFacilityFormPage: React.FC<EquipmentFacilityFormProps> = ({ itemT
                 } else {
                     await updateFacility(numericId, submissionData as Facility);
                 }
+                showNotification({
+                    type: 'success',
+                    title: `แก้ไข${itemType === 'equipment' ? 'อุปกรณ์' : 'สิ่งอำนวยความสะดวก'}สำเร็จ`,
+                    message: 'บันทึกการเปลี่ยนแปลงข้อมูลเรียบร้อยแล้ว',
+                    duration: 2000
+                });
             } else {
                 if (itemType === 'equipment') {
                     await createEquipment(submissionData as Omit<Equipment, 'id'>);
                 } else {
                     await createFacility(submissionData as Omit<Facility, 'id'>);
                 }
+                showNotification({
+                    type: 'success',
+                    title: `เพิ่ม${itemType === 'equipment' ? 'อุปกรณ์' : 'สิ่งอำนวยความสะดวก'}สำเร็จ`,
+                    message: 'เพิ่มข้อมูลใหม่เรียบร้อยแล้ว',
+                    duration: 2000
+                });
             }
-            navigate(itemType === 'facility' ? '/admin/equipment?view=facility' : '/admin/equipment');
+            setTimeout(() => {
+                navigate(itemType === 'facility' ? '/admin/equipment?view=facility' : '/admin/equipment');
+            }, 1000);
         } catch (error) {
             console.error(`Failed to save ${itemType}:`, error);
-            alert("ไม่สามารถบันทึกข้อมูลได้");
+            showNotification({
+                type: 'error',
+                title: 'ไม่สามารถบันทึกข้อมูลได้',
+                message: `เกิดข้อผิดพลาดในการบันทึกข้อมูล${itemType === 'equipment' ? 'อุปกรณ์' : 'สิ่งอำนวยความสะดวก'}`,
+                duration: 3000
+            });
         }
     };
     

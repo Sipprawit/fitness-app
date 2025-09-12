@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Layout, Menu, Button, message, theme } from "antd";
+import { Layout, Menu, Button, theme } from "antd";
+import { useNotification } from "../../components/Notification/NotificationProvider";
 
 import {
   UserOutlined,
@@ -25,7 +26,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const FullLayout: React.FC = () => {
   const page = localStorage.getItem("page");
   const actor = localStorage.getItem("actor"); // ดึงประเภทผู้ใช้งานจาก localStorage
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const [collapsed, setCollapsed] = useState(false);
 
   const {
@@ -40,7 +41,12 @@ const FullLayout: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isLogin");
     localStorage.removeItem("actor"); // ลบ actor เมื่อ logout
-    messageApi.success("Logout successful");
+    showNotification({
+      type: 'success',
+      title: 'ออกจากระบบสำเร็จ',
+      message: 'ออกจากระบบเรียบร้อยแล้ว',
+      duration: 2000
+    });
     setTimeout(() => {
       location.href = "/login";
     }, 1000);
@@ -122,17 +128,6 @@ const FullLayout: React.FC = () => {
     // เมนูสำหรับลูกค้า (Customer) - เป็นค่า default
     menuItems = (
       <>
-        <Menu.Item
-          key="dashboard"
-          onClick={() => setCurrentPage("dashboard")}
-          style={{ color: "white" }}
-        >
-          <Link to="/">
-            <HomeOutlined />
-            <span>หน้าหลัก</span>
-          </Link>
-        </Menu.Item>
-
         <Menu.Item
           key="booking"
           onClick={() => setCurrentPage("booking")}
@@ -228,7 +223,6 @@ const FullLayout: React.FC = () => {
 
   return (
     <Layout>
-      {contextHolder}
       <Sider
         style={{
           backgroundColor: "#C50000",
@@ -266,7 +260,7 @@ const FullLayout: React.FC = () => {
 
             <Menu
               style={{ backgroundColor: "#C50000" }}
-              defaultSelectedKeys={[page ? page : "dashboard"]}
+              defaultSelectedKeys={[page ? page : "booking"]}
               mode="inline"
             >
               {menuItems}

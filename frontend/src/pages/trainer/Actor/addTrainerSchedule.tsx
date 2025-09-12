@@ -6,7 +6,6 @@ import {
   Divider,
   Form,
   Card,
-  message,
   Input,
   DatePicker,
   TimePicker,
@@ -16,12 +15,13 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { CreateTrainerSchedule, GetTrainerById } from "../../../services/https";
 import type { TrainerInterface } from "../../../interface/ITrainer";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 import dayjs, { Dayjs } from "dayjs";
 
 function AddTrainerSchedule() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const [form] = Form.useForm();
   const [trainer, setTrainer] = useState<TrainerInterface | null>(null);
 
@@ -38,9 +38,11 @@ function AddTrainerSchedule() {
       console.log("AddTrainerSchedule - Trainer data set successfully");
     } else {
       console.log("AddTrainerSchedule - Failed to get trainer data");
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: "ไม่พบข้อมูลเทรนเนอร์",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบข้อมูลเทรนเนอร์",
+        duration: 3000
       });
       setTimeout(() => {
         navigate("/trainer");
@@ -54,9 +56,11 @@ function AddTrainerSchedule() {
     console.log("AddTrainerSchedule - Trainer data:", trainer);
     
     if (!values.available_date || !values.start_time || !values.end_time) {
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: "กรุณากรอกข้อมูลให้ครบถ้วน!",
+        title: "เกิดข้อผิดพลาด",
+        message: "กรุณากรอกข้อมูลให้ครบถ้วน!",
+        duration: 3000
       });
       return;
     }
@@ -81,18 +85,22 @@ function AddTrainerSchedule() {
     console.log("AddTrainerSchedule - API Response:", res);
 
     if (res.status === 201) {
-      messageApi.open({
+      showNotification({
         type: "success",
-        content: res.data.message,
+        title: "สำเร็จ",
+        message: res.data.message,
+        duration: 3000
       });
       form.resetFields();
       setTimeout(() => {
         navigate("/trainer");
       }, 1000);
     } else {
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: res.data.error,
+        title: "เกิดข้อผิดพลาด",
+        message: res.data.error,
+        duration: 3000
       });
     }
   };
@@ -113,9 +121,11 @@ function AddTrainerSchedule() {
       onGetTrainerById(trainerId);
     } else {
       console.log("AddTrainerSchedule - Invalid trainerId, redirecting to trainer");
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: "ไม่พบ TrainerID ใน URL! กำลังกลับสู่หน้าหลัก...",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบ TrainerID ใน URL! กำลังกลับสู่หน้าหลัก...",
+        duration: 3000
       });
       setTimeout(() => {
         navigate("/trainer");
@@ -127,7 +137,6 @@ function AddTrainerSchedule() {
   
   return (
     <div>
-      {contextHolder}
       <Card>
         <h2>เพิ่มตารางเวลาเทรนเนอร์</h2>
         <Divider />

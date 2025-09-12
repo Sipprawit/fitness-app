@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { message } from 'antd';
 import type { IClassBooking } from '../../interface/IClassBooking';
 import { getUserBookings, cancelClassBooking } from '../../services/apiService';
+import { useNotification } from '../../components/Notification/NotificationProvider';
 import '../admin/ClassActivity/ClassActivity.css';
 
 const BookClass: React.FC = () => {
   const [bookings, setBookings] = useState<IClassBooking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,7 +43,12 @@ const BookClass: React.FC = () => {
   const handleCancelBooking = async (bookingId: number) => {
     try {
       await cancelClassBooking(bookingId);
-      messageApi.success('ยกเลิกการจองสำเร็จ');
+      showNotification({
+        type: 'success',
+        title: 'สำเร็จ',
+        message: 'ยกเลิกการจองสำเร็จ',
+        duration: 3000
+      });
       
       // อัปเดตข้อมูลการจองหลังจากยกเลิก
       const userId = localStorage.getItem('id');
@@ -53,7 +58,12 @@ const BookClass: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error cancelling booking:', err);
-      messageApi.error(err.response?.data?.error || 'ไม่สามารถยกเลิกการจองได้');
+      showNotification({
+        type: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        message: err.response?.data?.error || 'ไม่สามารถยกเลิกการจองได้',
+        duration: 3000
+      });
     }
   };
 
@@ -106,7 +116,6 @@ const BookClass: React.FC = () => {
 
   return (
     <div className="main-content">
-      {contextHolder}
       <div className="content-section">
         <div className="header-with-button">
           <h2>ประวัติการจองคลาส</h2>

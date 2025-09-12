@@ -285,3 +285,35 @@
     gap: 10px;
     margin-top: 20px;
 }
+
+/* ปุ่มในฟอร์ม */
+.back-button, .save-button {
+    padding: 12px 25px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s !important;
+    min-width: 180px !important; /* ให้ปุ่มทั้งสองมีขนาดเท่ากัน */
+    text-align: center !important;
+    width: auto !important;
+    flex: none !important;
+}
+
+.back-button {
+    background-color: #e0e0e0 !important;
+    color: #333 !important;
+}
+
+.back-button:hover {
+    background-color: #c7c7c7 !important;
+}
+
+.save-button {
+    background-color: #d90505 !important;
+    color: white !important;
+}
+
+.save-button:hover {
+    background-color: #b30404 !important;
+}

@@ -8,13 +8,12 @@ import LoginPage from "../pages/auth/Login";
 import SignUpPage from "../pages/auth/Register";
 
 // Routes สำหรับลูกค้า (Customer)
-import Dashboard from "../pages/dashboard";
 import Booking from "../pages/classbooking/ClassHome";
 import BookClass from "../pages/classbooking/BookClass";
 import TrainerBooking from "../pages/trainer/trainer/trainerbooking"
 import HealthHome from "../pages/health/Health/HealthHome";
 import Nutrition from "../pages/health/nutrition/nutritionHome";
-import GroupSystem from "../pages/group/groupSystem";
+import GroupSystem from "../pages/group/GroupSystem";
 import ReviewSystem from "../pages/review/ReviewSystem";
 import Package from "../pages/package/packageHome";
 import Customer from "../pages/customer";
@@ -67,7 +66,7 @@ const ConfigRoutes: React.FC = () => {
         }
       >
         {/* --- Routes สำหรับลูกค้า (Customer) --- */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/booking" replace />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/class" element={<Booking />} />
         <Route path="/class/booking-history" element={<BookClass />} />

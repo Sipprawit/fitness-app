@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Row, Divider, Form, Input, Card, message, Select, Image } from "antd";
+import { Button, Col, Row, Divider, Form, Input, Card, Select, Image } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import type { GenderInterface } from "../../../interface/Gender";
 import { GetGender, GetTrainerById } from "../../../services/https";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 
 function ProfileTrainer() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const [gender, setGender] = useState<GenderInterface[]>([]);
   const [form] = Form.useForm();
   const [trainer, setTrainer] = useState<TrainerInterface | null>(null);
@@ -25,7 +26,12 @@ function ProfileTrainer() {
     const idStr = localStorage.getItem("id");
     const id = idStr ? Number(idStr) : NaN;
     if (!id || Number.isNaN(id)) {
-      messageApi.error("ไม่พบรหัสผู้ใช้ที่กำลังล็อกอิน");
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบรหัสผู้ใช้ที่กำลังล็อกอิน",
+        duration: 3000
+      });
       return;
     }
     const res = await GetTrainerById(id);
@@ -41,7 +47,12 @@ function ProfileTrainer() {
         gender_id: (data as any)?.gender?.ID,
       });
     } else {
-      messageApi.error(res.data?.error || "ไม่สามารถดึงข้อมูลเทรนเนอร์ได้");
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: res.data?.error || "ไม่สามารถดึงข้อมูลเทรนเนอร์ได้",
+        duration: 3000
+      });
     }
   };
 
@@ -56,7 +67,6 @@ function ProfileTrainer() {
 
   return (
     <>
-      {contextHolder}
       <Card>
         <Row align="middle" justify="space-between">
           <Col>

@@ -11,13 +11,18 @@ interface ItemCardProps {
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({ item, onReviewClick }) => {
-  // Debug: แสดงข้อมูลที่ได้รับมา
-  console.log(`ItemCard for ${item.Name}:`, item);
-  console.log(`Reviews data:`, item.Reviews);
-  
   // ป้องกันกรณีที่ Reviews เป็น undefined/null จาก API
   const reviews: Review[] = Array.isArray(item.Reviews) ? item.Reviews : [];
-  console.log(`Processed reviews:`, reviews);
+  
+  // Debug: ตรวจสอบข้อมูล User ในรีวิว
+  if (reviews.length > 0) {
+    console.log(`ItemCard - First review User:`, reviews[0]?.User);
+    console.log(`ItemCard - User ID:`, reviews[0]?.User?.ID);
+    console.log(`ItemCard - User FirstName:`, reviews[0]?.User?.FirstName);
+    console.log(`ItemCard - User LastName:`, reviews[0]?.User?.LastName);
+    console.log(`ItemCard - User ProfileImage:`, reviews[0]?.User?.ProfileImage);
+  }
+
 
   // คำนวณคะแนนเฉลี่ยจากรีวิวทั้งหมด
   const averageRating = reviews.length > 0
@@ -72,19 +77,40 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, onReviewClick }) => {
       <div className="latest-reviews-section">
         <p className="section-title">ความคิดเห็นล่าสุด:</p>
         {latestTwoReviews.length > 0 ? (
-          latestTwoReviews.map((review: Review) => (
-            <div key={review?.ID} className="review-entry">
-              <div className="review-author">
-                <img src={`https://i.pravatar.cc/150?u=${review?.User?.FirstName || 'user'}`} alt={review?.User?.FirstName || 'User'} className="author-avatar" />
-                <span>{review?.User?.FirstName || ''} {review?.User?.LastName || ''}</span>
-                <div className="review-rating-stars">
-                  <StarRating rating={review?.Rating || 0} readOnly={true} sizeClass="small" theme="success" />
+
+          latestTwoReviews.map((review: Review) => {
+            return (
+              <div key={review?.ID} className="review-entry">
+                <div className="review-author">
+                  {review?.User?.ProfileImage ? (
+                    <img 
+                      src={review.User.ProfileImage.startsWith('http') ? review.User.ProfileImage : `http://localhost:8000${review.User.ProfileImage}`} 
+                      alt={`${review?.User?.FirstName || ''} ${review?.User?.LastName || ''}`} 
+                      className="author-avatar"
+                      onError={(e) => {
+                        // ถ้ารูปโปรไฟล์ไม่โหลดได้ ให้ใช้รูป default
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review?.User?.FirstName || 'User')}&background=c50000&color=fff&size=150`;
+                      }}
+                    />
+                  ) : (
+                    <img 
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(review?.User?.FirstName || 'User')}&background=c50000&color=fff&size=150`} 
+                      alt={`${review?.User?.FirstName || ''} ${review?.User?.LastName || ''}`} 
+                      className="author-avatar" 
+                    />
+                  )}
+                  <span>{review?.User?.FirstName || ''} {review?.User?.LastName || ''}</span>
+                  <div className="review-rating-stars">
+                    <StarRating rating={review?.Rating || 0} readOnly={true} sizeClass="small" theme="warning" />
+                  </div>
                 </div>
+                <p className="review-comment">"{review?.Comment || ''}"</p>
+                <span className="review-date">{review?.CreatedAt ? new Date(review.CreatedAt).toLocaleDateString('th-TH') : ''}</span>
               </div>
-              <p className="review-comment">"{review?.Comment || ''}"</p>
-              <span className="review-date">{review?.CreatedAt ? new Date(review.CreatedAt).toLocaleDateString('th-TH') : ''}</span>
-            </div>
-          ))
+            );
+          })
+
         ) : (
           <p className="no-reviews">ยังไม่มีรีวิว</p>
         )}

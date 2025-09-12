@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { message } from "antd";
 import { GetUsers, GetTrainers, GetGender } from "../../../services/https";
 import type { UsersInterface } from "../../../interface/IUser";
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 import "./userlist.css";
 
 type ViewMode = 'members' | 'trainers';
@@ -31,11 +31,11 @@ const formatDateOnly = (dateString: string | undefined): string => {
 function Customers() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showNotification } = useNotification();
   const [viewMode, setViewMode] = useState<ViewMode>('members');
   const [users, setUsers] = useState<UsersInterface[]>([]);
   const [trainers, setTrainers] = useState<TrainerInterface[]>([]);
   const [genders, setGenders] = useState<any[]>([]);
-  const [messageApi, contextHolder] = message.useMessage();
   const myId = localStorage.getItem("id");
 
   const getUsers = async () => {
@@ -46,11 +46,21 @@ function Customers() {
         setUsers(res.data);
       } else {
         setUsers([]);
-        messageApi.open({ type: "error", content: "ไม่สามารถดึงข้อมูลผู้ใช้ได้" });
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "ไม่สามารถดึงข้อมูลผู้ใช้ได้",
+          duration: 3000
+        });
       }
     } catch (error) {
       setUsers([]);
-      messageApi.open({ type: "error", content: "เกิดข้อผิดพลาดในการเชื่อมต่อ" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "เกิดข้อผิดพลาดในการเชื่อมต่อ",
+        duration: 3000
+      });
     }
   };
 
@@ -61,11 +71,21 @@ function Customers() {
         setTrainers(res.data);
       } else {
         setTrainers([]);
-        messageApi.open({ type: "error", content: "ไม่สามารถดึงข้อมูลเทรนเนอร์ได้" });
+        showNotification({
+          type: "error",
+          title: "เกิดข้อผิดพลาด",
+          message: "ไม่สามารถดึงข้อมูลเทรนเนอร์ได้",
+          duration: 3000
+        });
       }
     } catch (error) {
       setTrainers([]);
-      messageApi.open({ type: "error", content: "เกิดข้อผิดพลาดในการเชื่อมต่อ" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "เกิดข้อผิดพลาดในการเชื่อมต่อ",
+        duration: 3000
+      });
     }
   };
 
@@ -132,7 +152,6 @@ function Customers() {
 
   return (
     <>
-      {contextHolder}
       <div className="main-content">
         <div className="content-section">
           <div className="header-with-button">

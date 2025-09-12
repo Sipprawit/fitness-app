@@ -152,3 +152,29 @@ func DeleteReview(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }
+
+// GetReviews: ดึงรีวิวตาม reviewable_id และ reviewable_type
+func GetReviews(c *gin.Context) {
+	reviewableID := c.Query("reviewable_id")
+	reviewableType := c.Query("reviewable_type")
+
+	if reviewableID == "" || reviewableType == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "reviewable_id and reviewable_type are required"})
+		return
+	}
+
+	db := config.DB()
+	var reviews []entity.Review
+
+	// ดึงรีวิวพร้อมข้อมูล User
+	if err := db.Where("reviewable_id = ? AND reviewable_type = ?", reviewableID, reviewableType).
+		Preload("User").
+		Order("created_at DESC").
+		Find(&reviews).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reviews"})
+		return
+	}
+
+	c.JSON(http.StatusOK, reviews)
+}
+

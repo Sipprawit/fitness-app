@@ -1,6 +1,9 @@
 package group
 
 import (
+
+	"fmt"
+
 	"net/http"
 	"strconv"
 	"time"
@@ -52,7 +55,8 @@ func GetGroups(c *gin.Context) {
 	if len(groupIDs) > 0 {
 		var rows []gmRow
 		db.Table("group_members").
-			Select("workout_group_id, users_id, created_at,users_first_name,users_last_name").
+
+			Select("workout_group_id, users_id, created_at").
 			Where("workout_group_id IN ?", groupIDs).
 			Find(&rows)
 		for _, r := range rows {
@@ -60,6 +64,10 @@ func GetGroups(c *gin.Context) {
 				joinedAt[r.WorkoutGroupID] = map[uint]*time.Time{}
 			}
 			joinedAt[r.WorkoutGroupID][r.UsersID] = r.CreatedAt
+
+
+			fmt.Printf("Group %d, User %d, Joined at: %v\n", r.WorkoutGroupID, r.UsersID, r.CreatedAt)
+
 		}
 	}
 
@@ -84,6 +92,9 @@ func GetGroups(c *gin.Context) {
 			if mMap := joinedAt[g.ID]; mMap != nil {
 				j = mMap[m.ID]
 			}
+
+			fmt.Printf("Group %d, Member %d (%s), Joined at: %v\n", g.ID, m.ID, full, j)
+
 			gr.Members = append(gr.Members, memberResp{ID: m.ID, Name: full, JoinedAt: j})
 		}
 		resp = append(resp, gr)

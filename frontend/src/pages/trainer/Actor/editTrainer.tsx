@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   Card,
-  message,
   Select,
   Upload,
 } from "antd";
@@ -24,11 +23,12 @@ import {
 import type { TrainerInterface } from "../../../interface/ITrainer";
 import type { GenderInterface } from "../../../interface/Gender";
 import { useNavigate, useParams } from "react-router-dom";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 
 function TrainerEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: any }>();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const actor = localStorage.getItem("actor");
   const [gender, setGender] = useState<GenderInterface[]>([]);
   const [form] = Form.useForm();
@@ -41,9 +41,11 @@ function TrainerEdit() {
     if (res.status === 200) {
       setGender(res.data);
     } else {
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: "ไม่พบข้อมูลเพศ",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบข้อมูลเพศ",
+        duration: 3000
       });
       setTimeout(() => {
         if (actor === "admin") {
@@ -85,9 +87,11 @@ function TrainerEdit() {
 
       console.log(trainerData.profile_image);
     } else {
-      messageApi.open({
+      showNotification({
         type: "error",
-        content: "ไม่พบข้อมูลเทรนเนอร์",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบข้อมูลเทรนเนอร์",
+        duration: 3000
       });
       setTimeout(() => {
         if (actor === "admin") {
@@ -110,7 +114,12 @@ function TrainerEdit() {
         const uploadRes = await UploadImage(file);
 
         if (uploadRes.status !== 200) {
-          messageApi.error("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพใหม่");
+          showNotification({
+            type: "error",
+            title: "เกิดข้อผิดพลาด",
+            message: "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพใหม่",
+            duration: 3000
+          });
           return;
         }
         payload.profile_image = uploadRes.data.url;
@@ -123,9 +132,11 @@ function TrainerEdit() {
       let res = await UpdateTrainerById(id, payload);
 
       if (res.status === 200) {
-        messageApi.open({
+        showNotification({
           type: "success",
-          content: "แก้ไขข้อมูลเทรนเนอร์สำเร็จ!",
+          title: "สำเร็จ",
+          message: "แก้ไขข้อมูลเทรนเนอร์สำเร็จ!",
+          duration: 3000
         });
         setTimeout(() => {
           if (actor === "admin") {
@@ -135,13 +146,20 @@ function TrainerEdit() {
           }
         }, 2000);
       } else {
-        messageApi.open({
+        showNotification({
           type: "error",
-          content: res.data.error,
+          title: "เกิดข้อผิดพลาด",
+          message: res.data.error,
+          duration: 3000
         });
       }
     } catch (error: any) {
-      messageApi.error(error.response?.data?.error || "เกิดข้อผิดพลาด");
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: error.response?.data?.error || "เกิดข้อผิดพลาด",
+        duration: 3000
+      });
     }
   };
 
@@ -154,7 +172,6 @@ function TrainerEdit() {
 
   return (
     <div>
-      {contextHolder}
       <Card>
         <h2>แก้ไขข้อมูลเทรนเนอร์</h2>
         <Divider />

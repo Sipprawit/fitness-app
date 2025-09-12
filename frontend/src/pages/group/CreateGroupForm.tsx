@@ -2,6 +2,9 @@
 import './CreateGroupForm.css';
 import React, { useState } from 'react';
 
+import { useNotification } from '../../components/Notification/NotificationProvider';
+
+
 interface CreateGroupFormProps {
   onSubmit: (data: any) => void;
   onBack: () => void;
@@ -11,6 +14,9 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({ onSubmit, onBack }) =
   const [name, setName] = useState('');
   const [goal, setGoal] = useState('');
   const [maxMembers, setMaxMembers] = useState(10);
+
+  const { showNotification } = useNotification();
+
   
   // === จุดที่แก้ไข 1: เพิ่ม State สำหรับเก็บวันที่ และกำหนดค่าเริ่มต้นเป็นวันปัจจุบัน ===
   const getTodayString = () => {
@@ -24,7 +30,14 @@ const CreateGroupForm: React.FC<CreateGroupFormProps> = ({ onSubmit, onBack }) =
   const handleSubmit = () => {
     // เพิ่มการตรวจสอบว่าได้เลือกวันที่แล้ว
     if (!name || !goal || !startDate) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+
+      showNotification({
+        type: 'warning',
+        title: 'ข้อมูลไม่ครบถ้วน',
+        message: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+        duration: 2000
+      });
+
       return;
     }
     // === จุดที่แก้ไข 3: ส่ง `startDate` ที่เลือกไปด้วย ===

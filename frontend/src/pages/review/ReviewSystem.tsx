@@ -2,7 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ItemCard from './../review/ItemCard';
 import ReviewPage from './../review/ReviewPage';
-import { GetAllClasses, GetTrainers, CreateReview } from '../../services/https';
+
+import { GetTrainers, CreateReview, GetUserBookedClasses, GetUserBookedTrainers, GetReviewsByItem } from '../../services/https';
+import { useNotification } from '../../components/Notification/NotificationProvider';
 import './ReviewSystem.css';
 
 // --- Interfaces ---
@@ -10,6 +12,8 @@ export interface User {
   ID: number;
   FirstName: string;
   LastName: string;
+
+  ProfileImage?: string;
 }
 export interface Review {
   ID: number;
@@ -32,6 +36,9 @@ export interface TrainingItem {
 const ReviewSystem: React.FC = () => {
   // --- URL Parameters ---
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { showNotification } = useNotification();
+
   
   // --- State Management ---
   const [items, setItems] = useState<TrainingItem[]>([]);
@@ -46,17 +53,29 @@ const ReviewSystem: React.FC = () => {
   // --- API Calls ---
   const fetchItems = async () => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      console.error("No auth token found.");
-      alert("User not authenticated");
+
+    const userId = localStorage.getItem('id');
+    
+    if (!token || !userId) {
+      console.error("No auth token or user ID found.");
+      showNotification({
+        type: 'error',
+        title: 'ไม่สามารถเข้าสู่ระบบได้',
+        message: 'กรุณาเข้าสู่ระบบใหม่',
+        duration: 3000
+      });
       return;
     }
+    
     try {
       let response;
       if (filter === 'คลาส') {
-        response = await GetAllClasses();
+        // ดึงเฉพาะคลาสที่ผู้ใช้จองแล้ว
+        response = await GetUserBookedClasses(Number(userId));
       } else {
-        response = await GetTrainers();
+        // ดึงเฉพาะเทรนเนอร์ที่ผู้ใช้จองแล้ว
+        response = await GetUserBookedTrainers(Number(userId));
+
       }
 
       if (response.status !== 200) {
@@ -65,17 +84,119 @@ const ReviewSystem: React.FC = () => {
         return;
       }
 
-      console.log(`API Response for ${filter}:`, response.data);
+
+      console.log(`API Response for user's booked ${filter}:`, response.data);
+      console.log(`Full response object:`, response);
       const raw = Array.isArray(response.data) ? response.data : [];
       console.log(`Raw data length: ${raw.length}`);
+      console.log(`First booking item:`, raw[0]);
 
-      const formattedData: TrainingItem[] = raw.map((item: any) => {
-        console.log(`Processing ${filter} item:`, item);
+      const formattedData: TrainingItem[] = await Promise.all(raw.map(async (booking: any) => {
+        console.log(`Processing user's booked ${filter}:`, booking);
+        console.log(`Booking keys:`, Object.keys(booking));
+        console.log(`Booking values:`, Object.values(booking));
+        
+        // ดึงข้อมูลคลาสหรือเทรนเนอร์จาก booking
+        let item;
+        if (filter === 'คลาส') {
+          // สำหรับคลาส: ข้อมูลอาจอยู่ใน class_activity หรือ class_activity_id
+          item = booking.class_activity || booking.ClassActivity;
+          if (!item && booking.class_activity_id) {
+            // ถ้าไม่มีข้อมูลคลาสเต็ม ให้สร้างข้อมูลเบื้องต้น
+            item = { id: booking.class_activity_id, name: `คลาส ID: ${booking.class_activity_id}` };
+          }
+        } else {
+          // สำหรับเทรนเนอร์: ตรวจสอบ field ต่างๆ ที่อาจมี
+          console.log(`Looking for trainer data in booking...`);
+          console.log(`booking.trainer:`, booking.trainer);
+          console.log(`booking.Trainer:`, booking.Trainer);
+          console.log(`booking.schedule:`, booking.schedule);
+          console.log(`booking.schedule.Trainer:`, booking.schedule?.Trainer);
+          
+          // ดึงข้อมูลเทรนเนอร์จาก schedule.Trainer
+          item = booking.trainer || booking.Trainer || booking.schedule?.Trainer;
+          
+          if (!item) {
+            // หา trainer_id จาก field ต่างๆ
+            let trainerId = booking.trainer_id || booking.trainerID || booking.schedule?.TrainerID || booking.schedule?.trainer_id;
+            
+            if (trainerId) {
+              console.log(`No trainer data found, fetching trainer with ID: ${trainerId}`);
+              // ถ้าไม่มีข้อมูลเทรนเนอร์เต็ม ให้ดึงข้อมูลเทรนเนอร์จาก API
+              try {
+                const trainerResponse = await GetTrainers();
+                if (trainerResponse.status === 200 && Array.isArray(trainerResponse.data)) {
+                  const trainer = trainerResponse.data.find((t: any) => t.id === trainerId || t.ID === trainerId);
+                  if (trainer) {
+                    item = trainer;
+                    console.log(`Found trainer data for ID ${trainerId}:`, trainer);
+                  } else {
+                    // ถ้าไม่เจอเทรนเนอร์ ให้สร้างข้อมูลเบื้องต้น
+                    item = { id: trainerId, first_name: 'เทรนเนอร์', last_name: `ID: ${trainerId}` };
+                  }
+                } else {
+                  // ถ้าไม่สามารถดึงข้อมูลเทรนเนอร์ได้ ให้สร้างข้อมูลเบื้องต้น
+                  item = { id: trainerId, first_name: 'เทรนเนอร์', last_name: `ID: ${trainerId}` };
+                }
+              } catch (error) {
+                console.error(`Failed to fetch trainer data for ID ${trainerId}:`, error);
+                // ถ้าเกิด error ให้สร้างข้อมูลเบื้องต้น
+                item = { id: trainerId, first_name: 'เทรนเนอร์', last_name: `ID: ${trainerId}` };
+              }
+            }
+          }
+        }
+        
+        if (!item) {
+          console.warn(`No ${filter} data found in booking:`, booking);
+          console.warn(`Available fields in booking:`, Object.keys(booking));
+          console.warn(`Booking object:`, JSON.stringify(booking, null, 2));
+          
+          // ถ้าเป็นเทรนเนอร์และไม่พบข้อมูล ให้ลองสร้างข้อมูลเบื้องต้นจาก booking ID
+          if (filter === 'เทรนเนอร์') {
+            console.log(`Creating fallback trainer data from booking ID: ${booking.ID}`);
+            item = { 
+              id: booking.ID, 
+              first_name: 'เทรนเนอร์', 
+              last_name: `Booking ID: ${booking.ID}`,
+              skill: 'ไม่ระบุทักษะ'
+            };
+          } else {
+            return null;
+          }
+        }
+        
         console.log(`Item Reviews:`, item.Reviews);
+        console.log(`Item reviews:`, item.reviews);
         console.log(`Trainer data - first_name: ${item.first_name}, last_name: ${item.last_name}, skill: ${item.skill}`);
         console.log(`Class data - name: ${item.name}, Name: ${item.Name}, description: ${item.description}`);
         
-        const rawReviews = Array.isArray(item.Reviews) ? item.Reviews : (Array.isArray(item.reviews) ? item.reviews : []);
+        // ดึงข้อมูลรีวิวจาก item หรือจาก booking
+        let rawReviews = Array.isArray(item.Reviews) ? item.Reviews : (Array.isArray(item.reviews) ? item.reviews : []);
+        
+        // ถ้าไม่มีรีวิวใน item ให้ลองดึงจาก booking
+        if (rawReviews.length === 0 && booking.reviews) {
+          rawReviews = Array.isArray(booking.reviews) ? booking.reviews : [];
+        }
+        
+        // ถ้ายังไม่มีรีวิว ให้ดึงข้อมูลรีวิวจาก API
+        if (rawReviews.length === 0) {
+          try {
+            console.log(`No reviews found in item/booking, fetching reviews from API for ${filter} ID: ${item.ID || item.id}`);
+            const reviewResponse = await GetReviewsByItem(item.ID || item.id, filter === 'คลาส' ? 'classes' : 'trainers');
+            
+            if (reviewResponse && reviewResponse.status === 200) {
+              rawReviews = Array.isArray(reviewResponse.data) ? reviewResponse.data : [];
+              console.log(`Found reviews from API:`, rawReviews);
+            }
+          } catch (error) {
+            console.error(`Failed to fetch reviews:`, error);
+          }
+        }
+        
+        console.log(`Final raw reviews:`, rawReviews);
+        console.log(`First review User data:`, rawReviews[0]?.User);
+
         const normalizedReviews: Review[] = rawReviews.map((r: any) => ({
           ID: r.ID ?? r.id ?? 0,
           Rating: r.Rating ?? r.rating ?? 0,
@@ -85,6 +206,8 @@ const ReviewSystem: React.FC = () => {
             ID: r.User?.ID ?? r.user?.ID ?? r.user?.id ?? 0,
             FirstName: r.User?.FirstName ?? r.user?.FirstName ?? r.user?.first_name ?? '',
             LastName: r.User?.LastName ?? r.user?.LastName ?? r.user?.last_name ?? '',
+            ProfileImage: r.User?.Avatar ?? r.user?.Avatar ?? r.user?.avatar ?? r.user?.ProfileImage ?? r.user?.profile_image ?? '',
+
           },
         }));
 
@@ -114,16 +237,26 @@ const ReviewSystem: React.FC = () => {
           relatedName: relatedName,
         } as TrainingItem;
         
-        console.log(`Formatted ${filter} item:`, result);
-        return result;
-      });
 
-      setItems(formattedData);
+        console.log(`Formatted user's booked ${filter} item:`, result);
+        return result;
+      }));
+      
+      // กรอง null items ออก
+      const validItems = formattedData.filter(item => item !== null);
+
+      setItems(validItems);
     } catch (error: any) {
       console.error(`Failed to fetch ${filter}:`, error);
       
       if (error.response?.status === 401) {
-        alert('เซสชันหมดอายุ กรุณาล็อกอินใหม่');
+        showNotification({
+          type: 'error',
+          title: 'เซสชันหมดอายุ',
+          message: 'กรุณาล็อกอินใหม่',
+          duration: 3000
+        });
+
         localStorage.clear();
         window.location.href = '/login';
         return;
@@ -136,7 +269,12 @@ const ReviewSystem: React.FC = () => {
   const handleSubmitReview = async (itemId: number, review: { rating: number; comment: string }) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('กรุณาล็อกอินก่อนรีวิว');
+      showNotification({
+        type: 'warning',
+        title: 'กรุณาล็อกอินก่อนรีวิว',
+        message: 'กรุณาเข้าสู่ระบบก่อนเขียนรีวิว',
+        duration: 3000
+      });
       window.location.href = '/login';
       return;
     }
@@ -152,27 +290,51 @@ const ReviewSystem: React.FC = () => {
       const response = await CreateReview(reviewData);
       
       if (response.status === 200 || response.status === 201) {
-        alert('ขอบคุณสำหรับรีวิวครับ!');
+
+        showNotification({
+          type: 'success',
+          title: 'ขอบคุณสำหรับรีวิวครับ!',
+          message: 'รีวิวของคุณได้รับการบันทึกเรียบร้อยแล้ว',
+          duration: 2000
+        });
+
         setItemToReview(null);
         console.log('Review submitted successfully, refreshing data...');
         await fetchItems(); // ดึงข้อมูลใหม่เพื่ออัปเดตหน้าจอ
         console.log('Data refreshed after review submission');
       } else {
         const msg = response.data?.error || 'ส่งรีวิวไม่สำเร็จ';
-        alert(`ส่งรีวิวไม่สำเร็จ: ${msg}`);
+
+        showNotification({
+          type: 'error',
+          title: 'ไม่สามารถส่งรีวิวได้',
+          message: msg,
+          duration: 3000
+        });
       }
     } catch (error: any) {
       console.error("Failed to submit review:", error);
       
       if (error.response?.status === 401) {
-        alert('เซสชันหมดอายุ กรุณาล็อกอินใหม่');
+        showNotification({
+          type: 'error',
+          title: 'เซสชันหมดอายุ',
+          message: 'กรุณาล็อกอินใหม่',
+          duration: 3000
+        });
         localStorage.clear();
         window.location.href = '/login';
         return;
       }
       
       const msg = error.response?.data?.error || error.message || 'ส่งรีวิวไม่สำเร็จ';
-      alert(`ส่งรีวิวไม่สำเร็จ: ${msg}`);
+      showNotification({
+        type: 'error',
+        title: 'ไม่สามารถส่งรีวิวได้',
+        message: msg,
+        duration: 3000
+      });
+
     }
   };
 
@@ -228,7 +390,12 @@ const ReviewSystem: React.FC = () => {
           ))
         ) : (
           <div className="no-items-message">
-            <p>ไม่พบ{filter}ที่ค้นหา</p>
+
+            <p>คุณยังไม่ได้จอง{filter}ใดๆ หรือไม่พบ{filter}ที่ค้นหา</p>
+            <p style={{ fontSize: '14px', color: '#666', marginTop: '8px' }}>
+              กรุณาจอง{filter}ก่อนจึงจะสามารถรีวิวได้
+            </p>
+
           </div>
         )}
       </div>

@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   Card,
-  message,
   DatePicker,
   InputNumber,
   Select,
@@ -17,11 +16,12 @@ import { PlusOutlined } from "@ant-design/icons";
 import type { GenderInterface } from "../../../../interface/Gender";
 import { GetGender, CreateUser } from "../../../../services/https";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../../../components/Notification/NotificationProvider";
 
 
 function CustomerCreate() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
   const [gender, setGender] = useState<GenderInterface[]>([]);
 
   // ดึงข้อมูลเพศ
@@ -30,7 +30,12 @@ function CustomerCreate() {
     if (res.status === 200) {
       setGender(res.data);
     } else {
-      messageApi.open({ type: "error", content: "ไม่พบข้อมูลเพศ" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: "ไม่พบข้อมูลเพศ",
+        duration: 3000
+      });
       setTimeout(() => navigate("/admin/List"), 2000);
     }
   };
@@ -55,10 +60,20 @@ function CustomerCreate() {
     console.log("API Response:", res);
 
     if (res.status === 200 || res.status === 201) {
-      messageApi.open({ type: "success", content: res.data.message });
+      showNotification({
+        type: "success",
+        title: "สำเร็จ",
+        message: res.data.message,
+        duration: 3000
+      });
       navigate("/admin/List");
     } else {
-      messageApi.open({ type: "error", content: res.data.error || "เกิดข้อผิดพลาด" });
+      showNotification({
+        type: "error",
+        title: "เกิดข้อผิดพลาด",
+        message: res.data.error || "เกิดข้อผิดพลาด",
+        duration: 3000
+      });
     }
   };
 
@@ -68,7 +83,6 @@ function CustomerCreate() {
 
   return (
     <div>
-      {contextHolder}
       <Card>
         <h2>เพิ่มข้อมูล ผู้ดูแลระบบ</h2>
         <Divider />

@@ -18,8 +18,6 @@ import {
 
   Card,
 
-  message,
-
   DatePicker,
 
   InputNumber,
@@ -38,6 +36,8 @@ import { GetGender, GetUsersById, UpdateUsersById } from "../../../../services/h
 
 import { useNavigate, Link, useParams } from "react-router-dom";
 
+import { useNotification } from "../../../../components/Notification/NotificationProvider";
+
 import dayjs from "dayjs";
 
 
@@ -47,7 +47,7 @@ function CustomerEdit() {
 
   const { id } = useParams<{ id: any }>();
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { showNotification } = useNotification();
 
   const [gender, setGender] = useState<GenderInterface[]>([]);
 
@@ -64,11 +64,15 @@ function CustomerEdit() {
 
     } else {
 
-      messageApi.open({
+      showNotification({
 
         type: "error",
 
-        content: "ไม่พบข้อมูลเพศ",
+        title: "เกิดข้อผิดพลาด",
+
+        message: "ไม่พบข้อมูลเพศ",
+
+        duration: 3000
 
       });
 
@@ -108,11 +112,15 @@ function CustomerEdit() {
 
     } else {
 
-      messageApi.open({
+      showNotification({
 
         type: "error",
 
-        content: "ไม่พบข้อมูลผู้ใช้",
+        title: "เกิดข้อผิดพลาด",
+
+        message: "ไม่พบข้อมูลผู้ใช้",
+
+        duration: 3000
 
       });
 
@@ -140,11 +148,15 @@ function CustomerEdit() {
 
     if (res.status == 200) {
 
-      messageApi.open({
+      showNotification({
 
         type: "success",
 
-        content: res.data.message,
+        title: "สำเร็จ",
+
+        message: res.data.message,
+
+        duration: 3000
 
       });
 
@@ -156,11 +168,15 @@ function CustomerEdit() {
 
     } else {
 
-      messageApi.open({
+      showNotification({
 
         type: "error",
 
-        content: res.data.error,
+        title: "เกิดข้อผิดพลาด",
+
+        message: res.data.error,
+
+        duration: 3000
 
       });
 
@@ -181,8 +197,6 @@ function CustomerEdit() {
   return (
 
     <div>
-
-      {contextHolder}
 
       <Card>
 

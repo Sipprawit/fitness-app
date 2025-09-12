@@ -1,7 +1,8 @@
 // src/pages/trainer/trainer/TrainerSchedule.tsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Spin, Button, DatePicker, Modal, message } from "antd";
+import { Spin, Button, DatePicker, Modal } from "antd";
+import { useNotification } from "../../../components/Notification/NotificationProvider";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import "dayjs/locale/th";
@@ -51,6 +52,7 @@ const BookTrainSchedule: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<Schedule | null>(null);
+  const { showNotification } = useNotification();
 
   const fetchTrainer = async () => {
     if (!id) return;
@@ -176,7 +178,12 @@ const BookTrainSchedule: React.FC = () => {
       const res = await BookTrainerSchedule(selectedSlot.ID, userId);
 
       if (res?.status === 201) {
-        message.success("จองสำเร็จ");
+        showNotification({
+          type: 'success',
+          title: 'จองสำเร็จ',
+          message: 'จองเทรนเนอร์เรียบร้อยแล้ว',
+          duration: 2000
+        });
 
         // ✅ ดึง booking จาก backend
         const booking = res.data?.data; // <-- backend ส่ง {"message": "...", "data": {...}}
@@ -217,7 +224,12 @@ const BookTrainSchedule: React.FC = () => {
     try {
       const res = await CancelTrainBooking(bookingId);
       if (res?.status === 200) {
-        message.success("ยกเลิกสำเร็จ");
+        showNotification({
+          type: 'success',
+          title: 'ยกเลิกสำเร็จ',
+          message: 'ยกเลิกการจองเรียบร้อยแล้ว',
+          duration: 2000
+        });
 
         setSchedules((prev) =>
           prev.map((s) =>
@@ -333,20 +345,27 @@ const BookTrainSchedule: React.FC = () => {
 
                 if (slot.status === "Booked") {
                   if (slot.user_id === Number(localStorage.getItem("id"))) {
+                    const canCancel = !slot.isPast; // ตรวจสอบว่าไม่เลยเวลา
                     cellContent = (
                       <>
                         <span>จองแล้ว</span>
                         <br />
-                        <Button
-                          type="link"
-                          style={{ color: "red", padding: 0 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelBooking(slot.booking_id); // ✅ ใช้ booking_id
-                          }}
-                        >
-                          ยกเลิก
-                        </Button>
+                        {canCancel ? (
+                          <Button
+                            type="link"
+                            style={{ color: "red", padding: 0 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelBooking(slot.booking_id); // ✅ ใช้ booking_id
+                            }}
+                          >
+                            ยกเลิก
+                          </Button>
+                        ) : (
+                          <span style={{ color: "#999", fontSize: "12px" }}>
+                            ไม่สามารถยกเลิกได้
+                          </span>
+                        )}
                       </>
                     );
                   } else {

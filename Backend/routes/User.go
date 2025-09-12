@@ -11,4 +11,5 @@ func UserProfileRoutes(api *gin.RouterGroup) {
 	api.GET("/user/profile", users.GetProfile)
 	api.PUT("/user/profile", users.UpdateProfile)
 	api.POST("/user/avatar", users.UploadAvatar)
+	api.DELETE("/user/avatar", users.DeleteAvatar)
 }
